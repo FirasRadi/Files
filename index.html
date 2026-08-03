@@ -26,15 +26,17 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); -webkit-tap-highlight-color: transparent; }
 
-        body { background-color: var(--bg-base); background-image: radial-gradient(circle at top left, #1e293b, #0f172a); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; overflow: hidden }
+        /* السماح للسحب للأسفل بشكل طبيعي */
+        html, body { overflow-x: hidden; overflow-y: auto; background-color: var(--bg-base); background-image: radial-gradient(circle at top left, #1e293b, #0f172a); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; }
 
-        .player-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); width: 100%; max-width: 420px; border-radius: 28px; padding: 14px 20px 10px; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5); text-align: center; position: relative; border: 1px solid var(--border-glass); display: flex; flex-direction: column; gap: 8px; z-index: 10; margin-top: -40px; overflow: hidden; }
+        .player-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); width: 100%; max-width: 420px; border-radius: 28px; padding: 14px 20px 10px; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5); text-align: center; position: relative; border: 1px solid var(--border-glass); display: flex; flex-direction: column; gap: 8px; z-index: 10; margin: auto; overflow: hidden; }
         .player-card > * { position: relative; z-index: 2; }
         #decorCanvas { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; z-index: 0 !important; pointer-events: none !important; }
 
         .header { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
-        .header-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-        .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        /* تقليل المسافات لعدم تمدد الشاشة */
+        .header-left { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+        .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
         .header-country { flex: 0 1 auto; font-size: 18px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; letter-spacing: 1px; padding: 4px 14px; border: 1px solid var(--text-sub); border-radius: 0px; text-transform: capitalize; align-self: center; margin: -5px auto 0; }
 
         .icon-btn { background: var(--border-glass); border: none; color: var(--text-sub); width: 40px; height: 40px; border-radius: 50%; font-size: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
@@ -122,11 +124,11 @@
         #searchResults li { padding: 10px 14px; margin-bottom: 6px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer; transition: 0.2s; font-size: 14px; }
         #searchResults li:hover { background: rgba(59,130,246,0.2); }
 
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 200; display: flex; flex-direction: column; padding: 25px 15px; backdrop-filter: blur(12px); transform-origin: center; transform: perspective(1200px) scale(0.7) rotateX(45deg); opacity: 0; visibility: hidden; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, visibility 0.5s; }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 200; display: flex; flex-direction: column; padding: 20px 15px; backdrop-filter: blur(12px); transform-origin: center; transform: perspective(1200px) scale(0.7) rotateX(45deg); opacity: 0; visibility: hidden; transition: 0.4s ease; overflow-y: auto; overscroll-behavior: contain; }
         .modal.open { transform: perspective(1200px) scale(1) rotateX(0deg); opacity: 1; visibility: visible; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-glass); }
         .close-modal { background: none; border: none; color: var(--text-sub); font-size: 24px; cursor: pointer; transition: 0.2s; }
-        .close-modal:hover { color: var(--danger); transform: rotate(90deg); }
+        .close-modal:hover { color: var(--danger); }
         .fav-list { flex: 1; overflow-y: auto; list-style: none; padding-right: 5px; }
         .fav-list::-webkit-scrollbar { width: 5px; }
         .fav-list::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
@@ -161,34 +163,35 @@
         .game-over-ui button { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; transition: 0.3s; }
         .game-over-ui button:hover { transform: scale(1.05); }
 
-        /* --- تصميم استوديو الطباعة والـ PDF (الأنيق والمرتب) --- */
-        .print-ui-wrapper { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 450px; margin: 0 auto; }
+        /* ====== أستوديو الطباعة الأنيق ====== */
+        .print-ui-wrapper { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 450px; margin: 0 auto; }
         
-        .preview-carousel { display: flex; gap: 10px; overflow-x: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-glass); min-height: 140px; align-items: center; }
-        .preview-carousel::-webkit-scrollbar { height: 6px; }
+        /* شريط المعاينة الثابت (لا يسبب اهتزاز) */
+        .preview-carousel { display: flex; gap: 10px; overflow-x: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-glass); height: 140px; align-items: center; }
+        .preview-carousel::-webkit-scrollbar { height: 4px; }
         .preview-carousel::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
         #emptyPreviewText { color: var(--text-sub); font-size: 13px; text-align: center; width: 100%; }
         
         .thumb-wrap { position: relative; flex-shrink: 0; width: 85px; height: 120px; border-radius: 8px; overflow: hidden; border: 2px solid var(--border-glass); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; } /* Cover لمطابقة شكل A4 */
+        .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; } 
         .thumb-wrap.bw-active img { filter: grayscale(100%) contrast(150%); }
-        .thumb-del { position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.8); color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .thumb-del { position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         
-        .pg-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* شبكة الأزرار الأنيقة (3 أزرار في كل سطر) */
+        .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         
-        .p-input { background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); color: #fff; padding: 10px 12px; border-radius: 8px; outline: none; font-size: 13px; width: 100%; box-sizing: border-box; }
-        .p-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--border-glass); color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; box-sizing: border-box; position: relative; overflow: hidden; }
-        .p-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
-        .p-btn.primary { background: var(--primary); border-color: var(--primary); }
-        .p-btn.primary:hover { background: var(--primary-hover); }
-        .p-btn.success { background: #10b981; border-color: #10b981; }
-        .p-btn.bw-toggle.active { background: #1e293b; border-color: #fff; color: #fff; }
+        .p-btn-sm { background: rgba(255,255,255,0.06); border: 1px solid var(--border-glass); color: #fff; padding: 12px 5px; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s; position: relative; overflow: hidden; text-align: center; }
+        .p-btn-sm i { font-size: 18px; color: var(--text-sub); }
+        .p-btn-sm:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+        .p-btn-sm.bw-active { background: #1e293b; border-color: #fff; color: #fff; }
+        .p-btn-sm.bw-active i { color: #fff; }
+        .p-btn-sm.primary { background: rgba(59, 130, 246, 0.15); border-color: var(--primary); }
+        .p-btn-sm.primary i { color: var(--primary); }
+        .p-btn-sm.success { background: rgba(16, 185, 129, 0.15); border-color: #10b981; }
+        .p-btn-sm.success i { color: #10b981; }
 
-        /* إخفاء التطبيق الأساسي عند الطباعة المباشرة */
-        @media print {
-            body * { visibility: hidden; margin: 0; padding: 0; background: none; }
-            #printFrame { display: block !important; visibility: visible !important; position: absolute; top: 0; left: 0; width: 100%; }
-        }
+        .p-input { background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); color: #fff; padding: 10px 12px; border-radius: 8px; outline: none; font-size: 13px; width: 100%; box-sizing: border-box; text-align: center; }
+        #printResults { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -203,15 +206,14 @@
                 <button class="icon-btn" id="shareBtn" title="Share Bot"><i class="fas fa-share-alt"></i></button>
                 <button class="icon-btn" id="themeBtn" title="Change Theme"><i class="fas fa-palette"></i></button>
                 <button class="icon-btn" id="decorToggleBtn" title="Toggle Decorations"><i class="fas fa-magic"></i></button>
-                <button class="icon-btn" id="removePhotoBtn" title="Remove Photo"><i class="fas fa-trash-alt"></i></button>
                 <button class="icon-btn" id="gameToggleBtn" title="Play Game" style="color: var(--warning);"><i class="fas fa-gamepad"></i></button>
-                <!-- زر الأستوديو الخاص بالطباعة -->
-                <button class="icon-btn" id="openPrintBtn" title="Print & PDF Studio" style="color: #a855f7;"><i class="fas fa-print"></i></button>
             </div>
             
             <div class="header-country" id="headerCountry">Global Radio</div>
             
             <div class="header-right">
+                <button class="icon-btn" id="openPrintBtn" title="Print Studio" style="color: #a855f7;"><i class="fas fa-print"></i></button>
+                <button class="icon-btn" id="removePhotoBtn" title="Remove Photo"><i class="fas fa-trash-alt"></i></button>
                 <a href="https://www.paypal.com/qrcodes/p2pqrc/JE8TVPBFXA566" target="_blank" class="donate-btn" title="Support Developer"><i class="fab fa-paypal"></i></a>
                 <button class="icon-btn" id="openFavsBtn" title="Saved Stations"><i class="fas fa-list-ul"></i></button>
                 <button class="icon-btn" id="notesBtn" title="My Notes"><i class="fas fa-edit"></i></button>
@@ -279,43 +281,55 @@
     <div class="bottom-sheet" id="notesSheet">
         <div class="sheet-header"><div><i class="fas fa-edit" style="color:var(--primary); margin-right:5px;"></i> Personal Notes</div><button class="close-sheet" id="closeNotesBtn"><i class="fas fa-times"></i></button></div>
         <textarea id="noteInput" rows="3" placeholder="Type your note here..."></textarea>
-        <button id="saveNoteBtn" class="p-btn primary" style="margin-top: 10px;">Save Note</button>
+        <button id="saveNoteBtn" style="background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px;">Save Note</button>
         <div style="flex:1; overflow-y:auto; margin-top:5px;"><ul id="notesList" style="list-style:none; display:flex; flex-direction:column; gap:8px;"></ul></div>
     </div>
 
-    <!-- نافذة أستوديو الطباعة والـ PDF (الأنيقة والمرتبة) -->
+    <!-- نافذة أستوديو الطباعة الأنيقة -->
     <div class="modal" id="printModal">
         <div class="modal-header">
-            <span>🖨️ Document Studio</span>
+            <span>🖨️ Print Studio</span>
             <button class="close-modal" id="closePrintBtn"><i class="fas fa-times"></i></button>
         </div>
         
         <div class="print-ui-wrapper">
-            
-            <!-- شريط الصور المضافة -->
+            <!-- شريط الصور المضافة بثبات (لا يسبب اهتزاز) -->
             <div class="preview-carousel" id="printPreviewArea">
-                <div id="emptyPreviewText">No images added. Pages: 0</div>
-                <!-- الصور ستضاف هنا برمجياً -->
+                <div id="emptyPreviewText">No Pages Added</div>
             </div>
 
-            <!-- أزرار الإضافة (رابط / استوديو) -->
-            <div style="display:flex; gap:8px;">
-                <input type="text" id="pImageUrl" class="p-input" placeholder="Paste link..." style="flex:1;">
-                <button class="p-btn primary" onclick="addFromUrl()" style="width: 50px;"><i class="fas fa-plus"></i></button>
-            </div>
-            
-            <button class="p-btn">
-                <i class="fas fa-folder-open"></i> 📁 Gallery (Multi)
-                <input type="file" id="pGalleryInput" accept="image/*" multiple onchange="addFromGallery(event)" style="position: absolute; inset:0; opacity:0; cursor:pointer;">
-            </button>
+            <!-- إدخال الرابط -->
+            <input type="text" id="pImageUrl" class="p-input" placeholder="🔗 Paste Image URL and press Enter..." onkeypress="if(event.key === 'Enter') addFromUrl()">
 
-            <!-- أزرار المعالجة والتصدير -->
-            <div class="pg-grid-2" style="margin-top: 5px;">
-                <button class="p-btn bw-toggle" id="btnToggleBW" onclick="togglePrintBW()">🖤 B&W Mode</button>
-                <button class="p-btn" id="btnDlImg" onclick="downloadAllImages()">⬇️ Image</button>
-                <button class="p-btn primary" id="btnDlPdf" onclick="generateBorderlessPDF()">📄 PDF</button>
-                <button class="p-btn success" id="btnPrint" onclick="printBorderless()">🖨️ Print</button>
+            <!-- أدوات الإضافة والتعديل -->
+            <div class="p-grid">
+                <button class="p-btn-sm" onclick="addFromUrl()">
+                    <i class="fas fa-link"></i> Add Link
+                </button>
+                <button class="p-btn-sm">
+                    <i class="fas fa-folder-open"></i> Gallery
+                    <input type="file" accept="image/*" multiple onchange="addFromGallery(event)" style="position: absolute; inset:0; opacity:0; cursor:pointer;">
+                </button>
+                <button class="p-btn-sm" id="btnToggleBW" onclick="togglePrintBW()">
+                    <i class="fas fa-adjust"></i> B&W Mode
+                </button>
             </div>
+
+            <!-- أدوات التصدير والطباعة -->
+            <div class="p-grid">
+                <button class="p-btn-sm primary" id="btnDlImg" onclick="downloadAllImages()">
+                    <i class="fas fa-image"></i> Save Image
+                </button>
+                <button class="p-btn-sm primary" id="btnDlPdf" onclick="generateBorderlessPDF()">
+                    <i class="fas fa-file-pdf"></i> Save PDF
+                </button>
+                <button class="p-btn-sm success" id="btnPrint" onclick="printBorderless()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+
+            <!-- مساحة لظهور النتيجة الجاهزة للتحميل داخل تليجرام -->
+            <div id="printResults"></div>
         </div>
     </div>
 
@@ -431,45 +445,45 @@
         });
         DOM.vol.addEventListener('input', () => { if (tg && tg.HapticFeedback && Math.random() > 0.4) { tg.HapticFeedback.impactOccurred('medium'); } });
 
-        // --- 🖨️ أستوديو الطباعة والـ PDF الجديد والمتطور (متعدد الصفحات وبدون إطار) ---
+        // --- 🖨️ أستوديو الطباعة والـ PDF الجديد والمتطور (بدون إطار وبأزرار أنيقة ومختصرة) ---
         (function initPrintStudio() {
             const printModal = document.getElementById('printModal');
-            document.getElementById('openPrintBtn').addEventListener('click', () => printModal.classList.add('open'));
-            document.getElementById('closePrintBtn').addEventListener('click', () => printModal.classList.remove('open'));
+            const openPrintBtn = document.getElementById('openPrintBtn');
+            const closePrintBtn = document.getElementById('closePrintBtn');
+            const resultsDiv = document.getElementById('printResults');
+
+            openPrintBtn.addEventListener('click', () => {
+                printModal.classList.add('open');
+                resultsDiv.innerHTML = ''; // مسح النتائج السابقة
+            });
+            
+            closePrintBtn.addEventListener('click', () => {
+                printModal.classList.remove('open');
+            });
 
             let imgList = [];
             let isBW = false;
             const previewArea = document.getElementById('printPreviewArea');
-            const emptyText = document.getElementById('emptyPreviewText');
             const btnToggleBW = document.getElementById('btnToggleBW');
 
             function updatePreviewUI() {
                 if (imgList.length === 0) {
-                    previewArea.innerHTML = '';
-                    previewArea.appendChild(emptyText);
-                    emptyText.textContent = `No images added. Pages: 0`;
+                    previewArea.innerHTML = '<div id="emptyPreviewText">No Pages Added</div>';
                     return;
                 }
                 previewArea.innerHTML = '';
                 imgList.forEach((src, idx) => {
                     const wrap = document.createElement('div');
                     wrap.className = `thumb-wrap ${isBW ? 'bw-active' : ''}`;
-                    wrap.innerHTML = `
-                        <img src="${src}" alt="Page ${idx+1}">
-                        <button class="thumb-del" onclick="removeImage(${idx})"><i class="fas fa-times"></i></button>
-                    `;
+                    wrap.innerHTML = `<img src="${src}" alt="Page ${idx+1}"><button class="thumb-del" onclick="removeImage(${idx})"><i class="fas fa-times"></i></button>`;
                     previewArea.appendChild(wrap);
                 });
             }
 
-            window.removeImage = function(idx) {
-                imgList.splice(idx, 1);
-                updatePreviewUI();
-            };
+            window.removeImage = function(idx) { imgList.splice(idx, 1); updatePreviewUI(); };
 
             function processIncomingImage(src) {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
+                const img = new Image(); img.crossOrigin = "anonymous";
                 img.onload = () => { imgList.push(src); updatePreviewUI(); };
                 img.onerror = () => alert("⚠️ Failed to load the image.");
                 img.src = src;
@@ -488,44 +502,36 @@
                     reader.onload = e => processIncomingImage(e.target.result);
                     reader.readAsDataURL(file);
                 });
-                event.target.value = ''; // Reset input
+                event.target.value = ''; 
             };
 
             window.togglePrintBW = function() {
                 isBW = !isBW;
                 if(isBW) {
-                    btnToggleBW.classList.add('active');
-                    btnToggleBW.innerHTML = "🎨 Color Mode";
+                    btnToggleBW.classList.add('bw-active');
+                    btnToggleBW.innerHTML = '<i class="fas fa-palette"></i> Color Mode';
                 } else {
-                    btnToggleBW.classList.remove('active');
-                    btnToggleBW.innerHTML = "🖤 B&W Mode";
+                    btnToggleBW.classList.remove('bw-active');
+                    btnToggleBW.innerHTML = '<i class="fas fa-adjust"></i> B&W Mode';
                 }
                 updatePreviewUI();
             };
 
-            // خوارزمية المعالجة الذكية للملء المثالي (A4 Cover Crop) وحذف الحواف البيضاء!
+            // خوارزمية ذكية لمطابقة الصورة تماماً لحجم A4 (لإلغاء الإطار الأبيض) وبدون أي تشويه
             function getProcessedBase64(src) {
                 return new Promise((resolve) => {
-                    const img = new Image();
-                    img.crossOrigin = "anonymous";
+                    const img = new Image(); img.crossOrigin = "anonymous";
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        // أبعاد A4 بدقة ممتازة لتفادي الإطار (1404x1986)
-                        canvas.width = 1404;
-                        canvas.height = 1986;
+                        // أبعاد A4 عالية الدقة
+                        canvas.width = 1404; canvas.height = 1986;
                         const ctx = canvas.getContext('2d');
-                        
-                        // تطبيق فلتر الأبيض والأسود إن كان مفعلاً
                         if (isBW) ctx.filter = 'grayscale(100%) contrast(150%)';
-                        
-                        // خلفية سوداء احتياطية تندمج مع صور الفضاء/الليل
-                        ctx.fillStyle = '#000';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                        // حساب القص الذكي (Cover) بدون تشويه الصورة
                         const hRatio = canvas.width / img.width;
                         const vRatio = canvas.height / img.height;
-                        const ratio = Math.max(hRatio, vRatio);
+                        const ratio = Math.max(hRatio, vRatio); // Max لعمل Cover كامل للصفحة
                         const centerShift_x = (canvas.width - img.width * ratio) / 2;
                         const centerShift_y = (canvas.height - img.height * ratio) / 2;
 
@@ -536,59 +542,61 @@
                 });
             }
 
-            // تحميل كل الصور
+            // لتخطي حظر تليجرام: يتم عرض الصور النهائية على الشاشة للحفظ المطول
             window.downloadAllImages = async function() {
                 if(imgList.length === 0) return alert("Add images first!");
-                const btn = document.getElementById('btnDlImg'); const txt = btn.innerHTML; btn.innerHTML = "⏳...";
+                const btn = document.getElementById('btnDlImg'); const txt = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wait...';
+                
+                resultsDiv.innerHTML = '<div style="color:var(--success); font-size:12px; font-weight:bold;">✅ Ready! Tap & Hold image to save:</div>';
+                const flexDiv = document.createElement('div');
+                flexDiv.style.cssText = "display:flex; gap:10px; overflow-x:auto; width:100%; padding:10px 0;";
+                
                 for(let i = 0; i < imgList.length; i++) {
                     const dataUrl = await getProcessedBase64(imgList[i]);
-                    const link = document.createElement('a');
-                    link.download = `Page_${i+1}.jpg`;
-                    link.href = dataUrl;
-                    link.click();
-                    await new Promise(r => setTimeout(r, 400)); // فاصل زمني صغير
+                    const img = document.createElement('img');
+                    img.src = dataUrl;
+                    img.style.cssText = "width: 120px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); border: 2px solid var(--primary); flex-shrink: 0;";
+                    flexDiv.appendChild(img);
                 }
+                resultsDiv.appendChild(flexDiv);
                 btn.innerHTML = txt;
             };
 
-            // تحميل PDF بدون هوامش وبصفحات متعددة
+            // لتخطي حظر تليجرام لـ PDF: توليد رابط تحميل ظاهر للمستخدم للضغط عليه
             window.generateBorderlessPDF = async function() {
                 if(imgList.length === 0) return alert("Add images first!");
-                const btn = document.getElementById('btnDlPdf'); const txt = btn.innerHTML; btn.innerHTML = "⏳...";
+                const btn = document.getElementById('btnDlPdf'); const txt = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wait...';
                 try {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const w = pdf.internal.pageSize.getWidth(); // 210
-                    const h = pdf.internal.pageSize.getHeight(); // 297
+                    const w = pdf.internal.pageSize.getWidth(); const h = pdf.internal.pageSize.getHeight();
 
                     for(let i = 0; i < imgList.length; i++) {
                         if(i > 0) pdf.addPage();
                         const imgData = await getProcessedBase64(imgList[i]);
-                        // وضع الصورة من الحافة للحافة تماماً
-                        pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
+                        pdf.addImage(imgData, 'JPEG', 0, 0, w, h); // تغطية الـ PDF بالكامل بدون هوامش
                     }
-                    pdf.save("Document.pdf");
-                } catch(e) { alert("Error"); }
+                    
+                    const blob = pdf.output('blob');
+                    const url = URL.createObjectURL(blob);
+                    
+                    resultsDiv.innerHTML = `<a href="${url}" download="Document.pdf" style="display:block; background:var(--success); color:#fff; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold; width:100%; text-align:center; margin-top:5px; border: 2px solid #059669; box-shadow: 0 4px 12px rgba(16,185,129,0.3);"><i class="fas fa-download"></i> Tap Here to Save PDF</a>`;
+                } catch(e) { alert("Error generating PDF"); }
                 btn.innerHTML = txt;
             };
 
-            // الطباعة المباشرة المتعددة باستخدام إطار مخفي
+            // نافذة الطباعة المباشرة عبر iframe (تعمل على بعض الأجهزة)
             window.printBorderless = async function() {
                 if(imgList.length === 0) return alert("Add images first!");
-                const btn = document.getElementById('btnPrint'); const txt = btn.innerHTML; btn.innerHTML = "⏳...";
+                const btn = document.getElementById('btnPrint'); const txt = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wait...';
                 
                 let printHtml = '<html><head><style>@page{margin:0;size:A4 portrait;} body{margin:0;background:#000;} img{width:210mm;height:297mm;object-fit:cover;page-break-after:always;display:block;}</style></head><body>';
-                
-                for(let i=0; i<imgList.length; i++) {
-                    const b64 = await getProcessedBase64(imgList[i]);
-                    printHtml += `<img src="${b64}">`;
-                }
+                for(let i=0; i<imgList.length; i++) { const b64 = await getProcessedBase64(imgList[i]); printHtml += `<img src="${b64}">`; }
                 printHtml += '</body></html>';
 
                 const iframe = document.createElement('iframe');
                 iframe.style.display = 'none';
                 document.body.appendChild(iframe);
-                
                 iframe.contentWindow.document.open();
                 iframe.contentWindow.document.write(printHtml);
                 iframe.contentWindow.document.close();
