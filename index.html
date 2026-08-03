@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        /* --- ألوان فاخرة (Dark Premium Theme) --- */
+        /* --- الألوان الفاخرة --- */
         :root {
             --bg-main: #09090b;
             --bg-dock: #18181b;
@@ -19,10 +19,9 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --accent: #3b82f6;
-            --danger: #ef4444;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg-main);
@@ -30,107 +29,62 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* لمنع اهتزاز الشاشة تماماً */
+            overflow: hidden;
         }
 
         /* --- الهيدر --- */
         .header {
-            padding: 20px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 1px;
+            padding: 20px; text-align: center; font-size: 24px; font-weight: 800;
             background: linear-gradient(90deg, #60a5fa, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             flex-shrink: 0;
         }
 
-        /* --- المسرح (مكان عرض الصور) --- */
+        /* --- المسرح (عرض الصور) --- */
         .stage {
-            flex: 1;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scroll-snap-type: x mandatory;
-            padding: 0 30px;
-            gap: 20px;
+            flex: 1; width: 100%; display: flex; align-items: center;
+            overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory;
+            padding: 0 30px; gap: 20px;
         }
         .stage::-webkit-scrollbar { display: none; }
 
         .empty-state {
-            width: 100%; text-align: center; color: var(--text-muted); font-size: 15px; font-weight: 600;
+            width: 100%; text-align: center; color: var(--text-muted); font-size: 16px; font-weight: bold;
         }
 
-        /* تصميم الورقة A4 في المعاينة */
         .page-card {
-            width: 65vw;
-            max-width: 260px;
-            aspect-ratio: 1 / 1.414; /* النسبة الذهبية لورقة A4 */
-            background: #111;
-            border-radius: 12px;
-            border: 1px solid #333;
-            flex-shrink: 0;
-            scroll-snap-align: center;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            overflow: hidden;
+            width: 65vw; max-width: 260px; aspect-ratio: 1 / 1.414; /* نسبة A4 */
+            background: #111; border-radius: 12px; border: 1px solid #333;
+            flex-shrink: 0; scroll-snap-align: center; position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden;
         }
-        .page-card img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .page-card.bw-on img {
-            filter: grayscale(100%) contrast(150%);
-        }
+        .page-card img { width: 100%; height: 100%; object-fit: cover; }
+        .page-card.bw-on img { filter: grayscale(100%) contrast(150%); }
+        
         .delete-btn {
-            position: absolute; top: 10px; right: 10px;
-            background: rgba(239, 68, 68, 0.9); color: #fff; border: none;
-            width: 30px; height: 30px; border-radius: 50%; font-size: 14px;
+            position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9);
+            color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%;
             display: flex; justify-content: center; align-items: center; cursor: pointer;
-            backdrop-filter: blur(5px);
         }
 
-        /* --- لوحة التحكم السفلية (الترتيب والتماثل المطلق) --- */
+        /* --- اللوحة السفلية (الأزرار المتطابقة) --- */
         .dock {
-            background: var(--bg-dock);
-            padding: 25px 20px calc(25px + env(safe-area-inset-bottom));
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
-            border-top: 1px solid #333;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-            flex-shrink: 0;
+            background: var(--bg-dock); padding: 25px 20px calc(25px + env(safe-area-inset-bottom));
+            border-top-left-radius: 30px; border-top-right-radius: 30px;
+            border-top: 1px solid #333; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); flex-shrink: 0;
         }
 
-        /* الشبكة السداسية (3 أعمدة × صفين) - أزرار متطابقة تماماً */
-        .grid-6 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
+        .grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
         .action-btn {
-            aspect-ratio: 1 / 0.95; /* شكل مربع/مستطيل أنيق متساوي للجميع */
-            background: var(--btn-bg);
-            border: 1px solid #333;
-            border-radius: 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: var(--text-main);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.15s ease-out;
-            position: relative;
+            aspect-ratio: 1 / 0.95; background: var(--btn-bg); border: 1px solid #333;
+            border-radius: 18px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 10px; color: var(--text-main); font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: 0.15s; position: relative;
         }
-        .action-btn i { font-size: 24px; }
+        .action-btn i { font-size: 26px; }
         .action-btn:active { transform: scale(0.92); background: var(--btn-active); }
         
-        /* تلوين الأيقونات لتمييز الوظائف بذكاء */
         .btn-link i { color: #0ea5e9; }
         .btn-gallery i { color: #3b82f6; }
         .btn-bw i { color: #f8fafc; }
@@ -138,11 +92,10 @@
         .btn-pdf i { color: #ef4444; }
         .btn-print i { color: #10b981; }
         
-        /* حالة الأبيض والأسود مفعلة */
         .action-btn.bw-active { background: #f8fafc; color: #000; }
         .action-btn.bw-active i { color: #000; }
 
-        /* --- النوافذ المنبثقة (Modals) الأنيقة --- */
+        /* --- نافذة الرابط المنبثقة --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
             z-index: 100; display: flex; justify-content: center; align-items: center;
@@ -151,7 +104,7 @@
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
         .modal-box {
-            background: var(--bg-dock); width: 100%; max-width: 360px;
+            background: var(--bg-dock); width: 100%; max-width: 350px;
             border-radius: 24px; border: 1px solid #333; padding: 25px;
             display: flex; flex-direction: column; gap: 15px; text-align: center;
             transform: translateY(20px); transition: 0.3s ease;
@@ -169,11 +122,7 @@
         }
         .modal-btn.close { background: #333; margin-top: -5px; }
 
-        .result-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; justify-content: center; }
-        .result-scroll img { width: 120px; border-radius: 8px; border: 1px solid var(--accent); }
-        .result-link { display: block; background: #10b981; color: #fff; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; }
-
-        /* --- إعدادات الطباعة المخفية --- */
+        /* --- الطباعة --- */
         #printZone { display: none; }
         @media print {
             body { background: white !important; margin: 0 !important; padding: 0 !important; display: block !important; }
@@ -188,74 +137,54 @@
 
     <div class="header">Print Studio</div>
 
-    <!-- المسرح (يتم سحب الصور هنا يميناً ويساراً) -->
+    <!-- مسرح عرض الصور -->
     <div class="stage" id="stageArea">
-        <div class="empty-state" id="emptyState">No pages yet.<br><span style="font-size:12px; opacity:0.5;">Add links or photos from the menu below.</span></div>
+        <div class="empty-state" id="emptyState">No pages yet.<br><span style="font-size:13px; opacity:0.5; font-weight:normal;">Add links or photos from the menu below.</span></div>
     </div>
 
-    <!-- لوحة التحكم (الشبكة المتماثلة 100%) -->
+    <!-- لوحة الأزرار (نفس اللي بالصورة) -->
     <div class="dock">
         <div class="grid-6">
-            <!-- 1. الرابط -->
             <div class="action-btn btn-link" onclick="openLinkModal()">
-                <i class="fas fa-link"></i>
-                <span>URL Link</span>
+                <i class="fas fa-link"></i><span>URL Link</span>
             </div>
             
-            <!-- 2. الاستوديو (يحتوي زر مخفي) -->
             <label class="action-btn btn-gallery">
-                <i class="fas fa-images"></i>
-                <span>Gallery</span>
+                <i class="fas fa-images"></i><span>Gallery</span>
                 <input type="file" accept="image/*" multiple onchange="handleGallery(event)" style="display:none;">
             </label>
             
-            <!-- 3. أبيض وأسود -->
             <div class="action-btn btn-bw" id="bwBtn" onclick="toggleBW()">
-                <i class="fas fa-adjust"></i>
-                <span>B&W</span>
+                <i class="fas fa-adjust"></i><span>B&W</span>
             </div>
             
-            <!-- 4. حفظ صورة -->
-            <div class="action-btn btn-img" onclick="generateImages()">
-                <i class="fas fa-image"></i>
-                <span>Image</span>
+            <!-- زر التحميل المباشر بضغطة واحدة -->
+            <div class="action-btn btn-img" onclick="downloadImageDirect()" id="btnImg">
+                <i class="fas fa-image"></i><span>Image</span>
             </div>
             
-            <!-- 5. حفظ PDF -->
-            <div class="action-btn btn-pdf" onclick="generatePDF()">
-                <i class="fas fa-file-pdf"></i>
-                <span>PDF</span>
+            <!-- زر التحميل المباشر بضغطة واحدة -->
+            <div class="action-btn btn-pdf" onclick="downloadPdfDirect()" id="btnPdf">
+                <i class="fas fa-file-pdf"></i><span>PDF</span>
             </div>
             
-            <!-- 6. طباعة -->
-            <div class="action-btn btn-print" onclick="executePrint()">
-                <i class="fas fa-print"></i>
-                <span>Print</span>
+            <div class="action-btn btn-print" onclick="executePrint()" id="btnPrint">
+                <i class="fas fa-print"></i><span>Print</span>
             </div>
         </div>
     </div>
 
-    <!-- نافذة إدخال الرابط -->
+    <!-- نافذة إدخال الرابط فقط -->
     <div class="modal-overlay" id="linkModal">
         <div class="modal-box">
             <h3 style="color:#fff;">Add Image URL</h3>
             <input type="text" id="urlInput" class="modal-input" placeholder="https://...">
             <button class="modal-btn" onclick="submitUrl()">Add Page</button>
-            <button class="modal-btn close" onclick="closeModals()">Cancel</button>
+            <button class="modal-btn close" onclick="closeLinkModal()">Cancel</button>
         </div>
     </div>
 
-    <!-- نافذة النتائج (للصور والـ PDF لتخطي حظر تليجرام) -->
-    <div class="modal-overlay" id="resultModal">
-        <div class="modal-box">
-            <h3 style="color:#fff;" id="resultTitle">Ready</h3>
-            <p style="font-size:13px; color:var(--text-muted);" id="resultSubtitle"></p>
-            <div id="resultContent"></div>
-            <button class="modal-btn close" onclick="closeModals()">Done</button>
-        </div>
-    </div>
-
-    <!-- مخزن الطباعة -->
+    <!-- مساحة الطباعة -->
     <div id="printZone"></div>
 
     <script>
@@ -269,10 +198,8 @@
         const emptyState = document.getElementById('emptyState');
         const bwBtn = document.getElementById('bwBtn');
         const linkModal = document.getElementById('linkModal');
-        const resultModal = document.getElementById('resultModal');
         const urlInput = document.getElementById('urlInput');
 
-        // تحديث المسرح (الواجهة الأمامية)
         function renderStage() {
             stageArea.innerHTML = '';
             if(pages.length === 0) {
@@ -282,29 +209,23 @@
             pages.forEach((src, idx) => {
                 const card = document.createElement('div');
                 card.className = `page-card ${isBw ? 'bw-on' : ''}`;
-                card.innerHTML = `
-                    <img src="${src}">
-                    <button class="delete-btn" onclick="removePage(${idx})"><i class="fas fa-times"></i></button>
-                `;
+                card.innerHTML = `<img src="${src}"><button class="delete-btn" onclick="removePage(${idx})"><i class="fas fa-times"></i></button>`;
                 stageArea.appendChild(card);
             });
         }
 
         window.removePage = function(idx) { pages.splice(idx, 1); renderStage(); };
 
-        // إضافة الصورة للمصفوفة
         function addPage(src) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
+            const img = new Image(); img.crossOrigin = "anonymous";
             img.onload = () => { pages.push(src); renderStage(); };
-            img.onerror = () => alert("⚠️ Cannot load image. Try saving it to gallery first.");
+            img.onerror = () => alert("⚠️ Cannot load link due to server protection. Please save the image to your phone first.");
             img.src = src;
         }
 
-        // معالجة النوافذ المنبثقة
         window.openLinkModal = () => { urlInput.value = ''; linkModal.classList.add('active'); };
-        window.closeModals = () => { linkModal.classList.remove('active'); resultModal.classList.remove('active'); };
-        window.submitUrl = () => { if(urlInput.value) { addPage(urlInput.value); closeModals(); } };
+        window.closeLinkModal = () => { linkModal.classList.remove('active'); };
+        window.submitUrl = () => { if(urlInput.value) { addPage(urlInput.value); closeLinkModal(); } };
 
         window.handleGallery = function(e) {
             const files = e.target.files;
@@ -323,13 +244,13 @@
             renderStage();
         };
 
-        // محرك المعالجة A4 (قص وتعبئة بدون أطراف بيضاء)
+        // معالجة A4 بدون أي أطراف بيضاء نهائياً
         function processPage(src) {
             return new Promise((resolve) => {
                 const img = new Image(); img.crossOrigin = "anonymous";
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 1404; canvas.height = 1986; // A4 مقاس ممتاز
+                    canvas.width = 1404; canvas.height = 1986; 
                     const ctx = canvas.getContext('2d');
                     
                     if (isBw) ctx.filter = 'grayscale(100%) contrast(150%)';
@@ -346,45 +267,67 @@
             });
         }
 
-        // تصدير الصور
-        window.generateImages = async function() {
+        // ==========================================
+        // 🚀 التحميل المباشر بضغطة واحدة (Image)
+        // ==========================================
+        window.downloadImageDirect = async function() {
             if(!pages.length) return alert("Add pages first!");
-            showLoading("Processing Images...");
+            const btn = document.getElementById('btnImg'); 
+            const originalHtml = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
             
-            let html = '<div class="result-scroll">';
             for(let i=0; i<pages.length; i++) {
                 const b64 = await processPage(pages[i]);
-                html += `<img src="${b64}">`;
+                const link = document.createElement('a');
+                link.href = b64;
+                link.download = `Page_${i+1}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                // تأخير بسيط إذا كان هناك عدة صور ليتمكن المتصفح من تحميلها تباعاً
+                await new Promise(r => setTimeout(r, 300));
             }
-            html += '</div>';
-            showResult("Images Ready", "Long-press any image to save it.", html);
+            btn.innerHTML = originalHtml;
         };
 
-        // تصدير PDF
-        window.generatePDF = async function() {
+        // ==========================================
+        // 🚀 التحميل المباشر بضغطة واحدة (PDF)
+        // ==========================================
+        window.downloadPdfDirect = async function() {
             if(!pages.length) return alert("Add pages first!");
-            showLoading("Generating PDF...");
+            const btn = document.getElementById('btnPdf'); 
+            const originalHtml = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
             
             try {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const w = pdf.internal.pageSize.getWidth(); const h = pdf.internal.pageSize.getHeight();
+                const w = pdf.internal.pageSize.getWidth(); 
+                const h = pdf.internal.pageSize.getHeight();
 
                 for(let i=0; i<pages.length; i++) {
                     if(i > 0) pdf.addPage();
                     const b64 = await processPage(pages[i]);
                     pdf.addImage(b64, 'JPEG', 0, 0, w, h);
                 }
-                const blobUrl = URL.createObjectURL(pdf.output('blob'));
-                const html = `<a href="${blobUrl}" download="Document.pdf" class="result-link"><i class="fas fa-download"></i> Download PDF</a>`;
-                showResult("PDF Ready", "Tap the button below to download or open.", html);
-            } catch(e) { alert("Error generating PDF."); closeModals(); }
+                
+                // هذا الأمر يقوم بالتحميل التلقائي الفوري!
+                pdf.save("Document.pdf"); 
+                
+            } catch(e) { 
+                alert("Error generating PDF."); 
+            }
+            btn.innerHTML = originalHtml;
         };
 
-        // طباعة مباشرة
+        // ==========================================
+        // 🖨️ الطباعة المباشرة
+        // ==========================================
         window.executePrint = async function() {
             if(!pages.length) return alert("Add pages first!");
-            showLoading("Preparing to Print...");
+            const btn = document.getElementById('btnPrint'); 
+            const originalHtml = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
             
             const pZone = document.getElementById('printZone');
             pZone.innerHTML = '';
@@ -396,24 +339,11 @@
             }
 
             setTimeout(() => {
-                closeModals();
                 window.print();
+                btn.innerHTML = originalHtml;
                 setTimeout(() => pZone.innerHTML = '', 1000);
             }, 500);
         };
-
-        function showLoading(text) {
-            document.getElementById('resultTitle').innerText = "Please Wait";
-            document.getElementById('resultSubtitle').innerText = text;
-            document.getElementById('resultContent').innerHTML = '<i class="fas fa-circle-notch fa-spin" style="font-size:40px; color:var(--accent); margin:20px 0;"></i>';
-            resultModal.classList.add('active');
-        }
-
-        function showResult(title, subtitle, contentHtml) {
-            document.getElementById('resultTitle').innerText = title;
-            document.getElementById('resultSubtitle').innerText = subtitle;
-            document.getElementById('resultContent').innerHTML = contentHtml;
-        }
     </script>
 </body>
 </html>
