@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Global Radio Player</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -30,15 +29,12 @@
         body { background-color: var(--bg-base); background-image: radial-gradient(circle at top left, #1e293b, #0f172a); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; overflow: hidden }
 
         .player-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); width: 100%; max-width: 420px; border-radius: 28px; padding: 14px 20px 10px; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5); text-align: center; position: relative; border: 1px solid var(--border-glass); display: flex; flex-direction: column; gap: 8px; z-index: 10; margin-top: -40px; overflow: hidden; }
-
         .player-card > * { position: relative; z-index: 2; }
-
         #decorCanvas { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; z-index: 0 !important; pointer-events: none !important; }
 
         .header { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
         .header-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
         .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-        
         .header-country { flex: 0 1 auto; font-size: 18px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; letter-spacing: 1px; padding: 4px 14px; border: 1px solid var(--text-sub); border-radius: 0px; text-transform: capitalize; align-self: center; margin: -5px auto 0; }
 
         .icon-btn { background: var(--border-glass); border: none; color: var(--text-sub); width: 40px; height: 40px; border-radius: 50%; font-size: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
@@ -126,9 +122,9 @@
         #searchResults li { padding: 10px 14px; margin-bottom: 6px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer; transition: 0.2s; font-size: 14px; }
         #searchResults li:hover { background: rgba(59,130,246,0.2); }
 
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 200; display: flex; flex-direction: column; padding: 30px 20px; backdrop-filter: blur(12px); transform-origin: center; transform: perspective(1200px) scale(0.7) rotateX(45deg) rotateY(-15deg); opacity: 0; visibility: hidden; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, visibility 0.6s; }
-        .modal.open { transform: perspective(1200px) scale(1) rotateX(0deg) rotateY(0deg); opacity: 1; visibility: visible; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 700; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-glass); }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 200; display: flex; flex-direction: column; padding: 25px 15px; backdrop-filter: blur(12px); transform-origin: center; transform: perspective(1200px) scale(0.7) rotateX(45deg); opacity: 0; visibility: hidden; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, visibility 0.5s; }
+        .modal.open { transform: perspective(1200px) scale(1) rotateX(0deg); opacity: 1; visibility: visible; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-glass); }
         .close-modal { background: none; border: none; color: var(--text-sub); font-size: 24px; cursor: pointer; transition: 0.2s; }
         .close-modal:hover { color: var(--danger); transform: rotate(90deg); }
         .fav-list { flex: 1; overflow-y: auto; list-style: none; padding-right: 5px; }
@@ -144,8 +140,6 @@
 
         #noteInput { background: rgba(255,255,255,0.05); color: #fff; padding: 12px; border-radius: 12px; border: 1px solid var(--border-glass); outline: none; resize: none; font-family: inherit; font-size: 13px; }
         #noteInput::placeholder { color: var(--text-sub); }
-        #saveNoteBtn { background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
-        #saveNoteBtn:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .note-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border: 1px solid var(--border-glass); position: relative; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
         .note-date { font-size: 10px; color: var(--warning); font-weight: 600; }
         .note-text { font-size: 13px; color: #fff; word-break: break-word; padding-right: 25px; line-height: 1.4; white-space: pre-wrap; text-align: left; }
@@ -167,31 +161,33 @@
         .game-over-ui button { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; transition: 0.3s; }
         .game-over-ui button:hover { transform: scale(1.05); }
 
-        /* --- إضافات تصميم طباعة وتحويل الصورة إلى PDF (تعديل الهوامش) --- */
-        .print-preview-container { width: 100%; height: 260px; overflow: hidden; position: relative; background-color: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed var(--hint-color); margin-bottom: 15px; }
-        #printPlaceholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--hint-color); font-size: 14px; text-align: center; width: 80%; pointer-events: none; z-index: 2; }
+        /* --- تصميم استوديو الطباعة والـ PDF (الأنيق والمرتب) --- */
+        .print-ui-wrapper { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 450px; margin: 0 auto; }
         
-        /* إزالة أي Padding لضمان تمدد الصورة للأطراف */
-        .a4-paper-mini { width: 210mm; height: 297mm; background-color: transparent; padding: 0 !important; box-sizing: border-box; display: flex; justify-content: center; align-items: center; transform: scale(0.22); transform-origin: center; position: absolute; opacity: 0; transition: opacity 0.3s; overflow: hidden; }
+        .preview-carousel { display: flex; gap: 10px; overflow-x: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-glass); min-height: 140px; align-items: center; }
+        .preview-carousel::-webkit-scrollbar { height: 6px; }
+        .preview-carousel::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        #emptyPreviewText { color: var(--text-sub); font-size: 13px; text-align: center; width: 100%; }
         
-        /* الصورة نفسها (object-fit: cover) لتمتد وتلغي الحواف البيضاء */
-        .a4-paper-mini img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s; display: block; }
+        .thumb-wrap { position: relative; flex-shrink: 0; width: 85px; height: 120px; border-radius: 8px; overflow: hidden; border: 2px solid var(--border-glass); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; } /* Cover لمطابقة شكل A4 */
+        .thumb-wrap.bw-active img { filter: grayscale(100%) contrast(150%); }
+        .thumb-del { position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.8); color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         
-        /* فلتر الأسود والأبيض */
-        .eco-mode img { filter: grayscale(100%) contrast(150%) brightness(110%); }
+        .pg-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .p-input { background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); color: #fff; padding: 10px 12px; border-radius: 8px; outline: none; font-size: 13px; width: 100%; box-sizing: border-box; }
+        .p-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--border-glass); color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; box-sizing: border-box; position: relative; overflow: hidden; }
+        .p-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+        .p-btn.primary { background: var(--primary); border-color: var(--primary); }
+        .p-btn.primary:hover { background: var(--primary-hover); }
+        .p-btn.success { background: #10b981; border-color: #10b981; }
+        .p-btn.bw-toggle.active { background: #1e293b; border-color: #fff; color: #fff; }
 
-        .print-input-group { display: flex; gap: 10px; margin-bottom: 10px; width: 100%; }
-        .print-input-group input { flex: 1; padding: 10px; border: 1px solid var(--border-glass); border-radius: 8px; background: rgba(255,255,255,0.05); color: #fff; outline: none; }
-        .print-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; width: 100%; }
-        
+        /* إخفاء التطبيق الأساسي عند الطباعة المباشرة */
         @media print {
-            body { background: white !important; margin: 0 !important; padding: 0 !important; background-image: none !important; }
-            .player-card, #loading, .sheet-overlay, .bottom-sheet, .modal:not(#printModal), .game-container { display: none !important; }
-            #printModal { background: transparent !important; padding: 0 !important; position: static !important; transform: none !important; opacity: 1 !important; visibility: visible !important; border: none !important; backdrop-filter: none !important; display: block !important; }
-            #printModal .modal-header, .print-controls-wrapper { display: none !important; }
-            .print-preview-container { height: auto !important; border: none !important; background: transparent !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
-            .a4-paper-mini { transform: scale(1) !important; position: relative !important; opacity: 1 !important; margin: 0 !important; page-break-after: always; }
-            @page { size: A4 portrait; margin: 0; }
+            body * { visibility: hidden; margin: 0; padding: 0; background: none; }
+            #printFrame { display: block !important; visibility: visible !important; position: absolute; top: 0; left: 0; width: 100%; }
         }
     </style>
 </head>
@@ -201,7 +197,6 @@
 
     <div class="player-card">
         <canvas id="decorCanvas"></canvas>
-
         <div class="header">
             <div class="header-left">
                 <button class="icon-btn" id="toggleTimerBtn" title="Timers"><i class="fas fa-stopwatch"></i><span id="mainHeaderTimer" class="header-timer-text"></span></button>
@@ -210,8 +205,8 @@
                 <button class="icon-btn" id="decorToggleBtn" title="Toggle Decorations"><i class="fas fa-magic"></i></button>
                 <button class="icon-btn" id="removePhotoBtn" title="Remove Photo"><i class="fas fa-trash-alt"></i></button>
                 <button class="icon-btn" id="gameToggleBtn" title="Play Game" style="color: var(--warning);"><i class="fas fa-gamepad"></i></button>
-                <!-- زر الطباعة -->
-                <button class="icon-btn" id="openPrintBtn" title="Print / Document Mode" style="color: #a855f7;"><i class="fas fa-print"></i></button>
+                <!-- زر الأستوديو الخاص بالطباعة -->
+                <button class="icon-btn" id="openPrintBtn" title="Print & PDF Studio" style="color: #a855f7;"><i class="fas fa-print"></i></button>
             </div>
             
             <div class="header-country" id="headerCountry">Global Radio</div>
@@ -258,81 +253,69 @@
             Change country inside the bot chat.<br>
             <span style="font-size: 5px; color: var(--text-sub);">Time spent in the app: &nbsp;&nbsp;&nbsp;</span><span id="listenTimeDisplay" style="font-size: 3px; color: var(--warning); font-family: monospace; letter-spacing: 2px;">00 : 00 : 00 : 00 : 00 : 00</span>
         </div>
-
         <audio id="audioPlayer" preload="metadata"></audio>
 
         <div class="game-container" id="gameContainer">
             <canvas id="gameCanvas"></canvas>
             <div class="game-over-ui" id="gameOverUI">
-                <h2>Game Over!</h2>
-                <p>Score: <span id="gameScore">0</span></p>
-                <button id="retryBtn"><i class="fas fa-redo"></i> Play Again</button>
+                <h2>Game Over!</h2><p>Score: <span id="gameScore">0</span></p><button id="retryBtn"><i class="fas fa-redo"></i> Play Again</button>
             </div>
         </div>
     </div>
     
-    <!-- Modals -->
+    <!-- Modals Backgrounds -->
     <div class="sheet-overlay" id="timerOverlay"></div>
     <div class="bottom-sheet" id="timerSheet">
         <div class="sheet-header"><div><i class="fas fa-stopwatch" style="color:var(--primary); margin-right:5px;"></i> Auto Timers <span id="sheetHeaderTimer" class="sheet-header-timer"></span></div><button class="close-sheet" id="closeTimerBtn"><i class="fas fa-times"></i></button></div>
         <div class="compact-timer-row"><div class="timer-info"><div class="timer-info-left"><i class="fas fa-moon" style="color:#60a5fa"></i> Sleep</div><span class="digital-timer" id="sleepDigital">00:00</span></div><div class="timer-actions" id="sleepActions"><button data-min="1">1m</button><button data-min="5">5m</button><button data-min="15">15m</button><button data-min="30">30m</button><button data-min="60">1h</button></div><button class="cancel-timer-btn" id="sleepCancelBtn">Cancel Sleep Timer</button></div>
         <div class="compact-timer-row"><div class="timer-info"><div class="timer-info-left"><i class="fas fa-clock" style="color:#4ade80"></i> Start</div><span class="digital-timer" id="startDigital">00:00</span></div><div class="timer-actions" id="startActions"><button data-min="1">1m</button><button data-min="5">5m</button><button data-min="15">15m</button><button data-min="30">30m</button><button data-min="60">1h</button></div><button class="cancel-timer-btn" id="startCancelBtn">Cancel Start Timer</button></div>
     </div>
-    
     <div class="sheet-overlay" id="themeOverlay"></div>
     <div class="bottom-sheet" id="themeSheet"><div class="sheet-header"><div><i class="fas fa-palette" style="color:var(--primary); margin-right:5px;"></i> Pick a Theme</div><button class="close-sheet" id="closeThemeBtn"><i class="fas fa-times"></i></button></div><div class="theme-colors" id="themeColors"></div></div>
-    
     <div class="sheet-overlay" id="searchOverlay"></div>
     <div class="bottom-sheet" id="searchSheet"><div class="sheet-header"><div><i class="fas fa-search" style="color:var(--primary); margin-right:5px;"></i> Search Station</div><button class="close-sheet" id="closeSearchBtn"><i class="fas fa-times"></i></button></div><input type="text" id="searchInput" placeholder="Type station name..." autocomplete="off" /><ul id="searchResults"></ul></div>
-    
     <div class="modal" id="favModal"><div class="modal-header"><span>Your Favorites</span><button class="close-modal" id="closeFavsBtn"><i class="fas fa-times"></i></button></div><ul class="fav-list" id="favList"></ul></div>
-
-    <!-- Notes Modal -->
     <div class="sheet-overlay" id="notesOverlay"></div>
     <div class="bottom-sheet" id="notesSheet">
         <div class="sheet-header"><div><i class="fas fa-edit" style="color:var(--primary); margin-right:5px;"></i> Personal Notes</div><button class="close-sheet" id="closeNotesBtn"><i class="fas fa-times"></i></button></div>
         <textarea id="noteInput" rows="3" placeholder="Type your note here..."></textarea>
-        <button id="saveNoteBtn" style="background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 10px;">Save Note</button>
-        <div style="flex:1; overflow-y:auto; margin-top:5px;">
-            <ul id="notesList" style="list-style:none; display:flex; flex-direction:column; gap:8px;"></ul>
-        </div>
+        <button id="saveNoteBtn" class="p-btn primary" style="margin-top: 10px;">Save Note</button>
+        <div style="flex:1; overflow-y:auto; margin-top:5px;"><ul id="notesList" style="list-style:none; display:flex; flex-direction:column; gap:8px;"></ul></div>
     </div>
 
-    <!-- نافذة تحويل الصورة إلى PDF (بدون هوامش) -->
-    <div class="modal" id="printModal" style="overflow-y: auto;">
+    <!-- نافذة أستوديو الطباعة والـ PDF (الأنيقة والمرتبة) -->
+    <div class="modal" id="printModal">
         <div class="modal-header">
-            <span>🖨️ Image to PDF</span>
+            <span>🖨️ Document Studio</span>
             <button class="close-modal" id="closePrintBtn"><i class="fas fa-times"></i></button>
         </div>
         
-        <div class="print-preview-container" id="printPreviewArea">
-            <div id="printPlaceholder">Please upload an image</div>
-            <!-- الورقة الأساسية للصورة -->
-            <div class="a4-paper-mini" id="stickerPaper"></div>
-        </div>
-
-        <div class="print-controls-wrapper" style="display: flex; flex-direction: column; width: 100%;">
-            <div class="print-input-group">
-                <input type="text" id="stickerImageUrl" placeholder="Paste image URL here...">
-                <button style="background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="loadStickerFromUrl()">Apply</button>
-            </div>
+        <div class="print-ui-wrapper">
             
-            <div style="position: relative; overflow: hidden; margin-bottom: 10px;">
-                <button style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold;">📁 Upload from Gallery</button>
-                <input type="file" id="stickerImageInput" accept="image/*" onchange="loadStickerFromFile(event)" style="font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%;">
+            <!-- شريط الصور المضافة -->
+            <div class="preview-carousel" id="printPreviewArea">
+                <div id="emptyPreviewText">No images added. Pages: 0</div>
+                <!-- الصور ستضاف هنا برمجياً -->
             </div>
 
-            <!-- إرجاع زر الأسود والأبيض كما طلبت -->
-            <button onclick="toggleStickerEcoMode()" id="stickerEcoBtn" style="background: linear-gradient(45deg, #475569 0%, #cbd5e1 100%); color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 5px;">🌿 Black & White (Eco)</button>
-            
-            <!-- أزرار التنزيل (صورة + PDF) -->
-            <div class="print-btn-row">
-                <button id="dlImgBtn" onclick="downloadStickerImage()" style="background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">⬇️ Image</button>
-                <button id="dlPdfBtn" onclick="downloadStickerPDF()" style="background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">📄 PDF</button>
+            <!-- أزرار الإضافة (رابط / استوديو) -->
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="pImageUrl" class="p-input" placeholder="Paste link..." style="flex:1;">
+                <button class="p-btn primary" onclick="addFromUrl()" style="width: 50px;"><i class="fas fa-plus"></i></button>
             </div>
             
-            <!-- زر الطباعة -->
-            <button onclick="window.print()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">🖨️ Print Direct</button>
+            <button class="p-btn">
+                <i class="fas fa-folder-open"></i> 📁 Gallery (Multi)
+                <input type="file" id="pGalleryInput" accept="image/*" multiple onchange="addFromGallery(event)" style="position: absolute; inset:0; opacity:0; cursor:pointer;">
+            </button>
+
+            <!-- أزرار المعالجة والتصدير -->
+            <div class="pg-grid-2" style="margin-top: 5px;">
+                <button class="p-btn bw-toggle" id="btnToggleBW" onclick="togglePrintBW()">🖤 B&W Mode</button>
+                <button class="p-btn" id="btnDlImg" onclick="downloadAllImages()">⬇️ Image</button>
+                <button class="p-btn primary" id="btnDlPdf" onclick="generateBorderlessPDF()">📄 PDF</button>
+                <button class="p-btn success" id="btnPrint" onclick="printBorderless()">🖨️ Print</button>
+            </div>
         </div>
     </div>
 
@@ -353,135 +336,19 @@
         let targetRaw = TG_PARAM.replace(/_/g, ' ') || PARAMS.get('name') || PARAMS.get('country') || '';
         const TARGET_COUNTRY = targetRaw.trim();
 
-        let audioUnlocked = false;
-        document.body.addEventListener('touchstart', function() {
-            if (!audioUnlocked && DOM.audio) {
-                let playPromise = DOM.audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(_ => { DOM.audio.pause(); audioUnlocked = true; }).catch(e => {});
-                }
-            }
-        }, { once: true });
+        let audioUnlocked = false; document.body.addEventListener('touchstart', function() { if (!audioUnlocked && DOM.audio) { let playPromise = DOM.audio.play(); if (playPromise !== undefined) { playPromise.then(_ => { DOM.audio.pause(); audioUnlocked = true; }).catch(e => {}); } } }, { once: true });
 
-        let decorState = 0; 
-        let decorCanvas = document.getElementById('decorCanvas');
-        let ctx = decorCanvas.getContext('2d');
-        let cw, ch;
-        let particles = [];
-        const neonColors = ['#ff0a54', '#3b82f6', '#10b981', '#fbbf24', '#8b5cf6', '#06b6d4'];
+        let decorState = 0; let decorCanvas = document.getElementById('decorCanvas'); let ctx = decorCanvas.getContext('2d'); let cw, ch; let particles = []; const neonColors = ['#ff0a54', '#3b82f6', '#10b981', '#fbbf24', '#8b5cf6', '#06b6d4'];
+        function resizeCanvas() { if (decorState === 2 || decorState === 4) { cw = decorCanvas.width = window.innerWidth; ch = decorCanvas.height = window.innerHeight; } else { const card = document.querySelector('.player-card'); cw = decorCanvas.width = card.offsetWidth; ch = decorCanvas.height = card.offsetHeight; } } window.addEventListener('resize', resizeCanvas);
+        function initParticles() { particles = []; for(let i=0; i<90; i++) { particles.push({ x: Math.random() * cw, y: Math.random() * ch, r: (decorState === 1 || decorState === 2) ? Math.random()*2 + 1 : Math.random()*2.5 + 1.5, s: (decorState === 1 || decorState === 2) ? Math.random()*0.5 + 0.2 : 0, d: Math.random()*0.8, c: (decorState === 1 || decorState === 2) ? neonColors[Math.floor(Math.random()*neonColors.length)] : 'rgba(255,255,255,0.9)' }); } }
+        let angle = 0; function animateDecor() { if (decorState === 0) { ctx.clearRect(0, 0, cw, ch); return; } ctx.clearRect(0, 0, cw, ch); angle += 0.01; ctx.beginPath(); for(let i=0; i<particles.length; i++) { let p = particles[i]; ctx.fillStyle = p.c; ctx.moveTo(p.x, p.y); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2, true); } ctx.fill(); for(let i=0; i<particles.length; i++) { let p = particles[i]; if (decorState === 1 || decorState === 2) { p.y += p.s; p.x += Math.sin(angle + p.d) * 0.5; } else if (decorState === 3 || decorState === 4) { p.y += Math.pow(p.d, 2) * 0.5 + 0.3; p.x += Math.sin(angle + p.d) * 0.3; } if(p.y > ch) { particles[i] = { ...p, x: Math.random()*cw, y: -5 }; } } } setInterval(animateDecor, 30);
+        DOM.decorToggleBtn.addEventListener('click', () => { decorState = (decorState + 1) % 5; if (decorState === 1 || decorState === 3) { document.querySelector('.player-card').insertBefore(decorCanvas, document.querySelector('.player-card').firstChild); } else if (decorState === 2 || decorState === 4) { document.body.prepend(decorCanvas); } resizeCanvas(); if (decorState > 0) initParticles(); let icon = DOM.decorToggleBtn.querySelector('i'); if(decorState === 0) { icon.className = 'fas fa-magic'; DOM.decorToggleBtn.style.color = 'var(--text-sub)'; } if(decorState === 1) { icon.className = 'fas fa-star'; DOM.decorToggleBtn.style.color = 'var(--warning)'; } if(decorState === 2) { icon.className = 'fas fa-star'; DOM.decorToggleBtn.style.color = 'var(--primary)'; } if(decorState === 3) { icon.className = 'fas fa-snowflake'; DOM.decorToggleBtn.style.color = '#fff'; } if(decorState === 4) { icon.className = 'fas fa-snowflake'; DOM.decorToggleBtn.style.color = '#cbd5e1'; } });
 
-        function resizeCanvas() {
-            if (decorState === 2 || decorState === 4) {
-                cw = decorCanvas.width = window.innerWidth;
-                ch = decorCanvas.height = window.innerHeight;
-            } else {
-                const card = document.querySelector('.player-card');
-                cw = decorCanvas.width = card.offsetWidth;
-                ch = decorCanvas.height = card.offsetHeight;
-            }
-        }
-        window.addEventListener('resize', resizeCanvas);
+        function initVisualizer() { var visDiv = document.getElementById('cool-visualizer'); var html = ''; for(var i=0; i<20; i++){ html += '<div class=\"vis-bar\"></div>'; } visDiv.innerHTML = html; var bars = visDiv.querySelectorAll('.vis-bar'); var visTimer; function renderFrame() { if(DOM.audio.paused) return; bars.forEach((bar, i) => { var dist = Math.abs(i - 12); var maxH = 26 - (dist * 1.0); var h = 4 + Math.random() * maxH; bar.style.height = h + 'px'; }); visTimer = setTimeout(renderFrame, 80 + Math.random() * 40); } window.startVis = function() { visDiv.classList.add('vis-active'); renderFrame(); }; window.stopVis = function() { visDiv.classList.remove('vis-active'); clearTimeout(visTimer); bars.forEach(b => b.style.height = '4px'); }; DOM.audio.addEventListener('play', window.startVis); DOM.audio.addEventListener('pause', window.stopVis); DOM.audio.addEventListener('waiting', window.stopVis); DOM.audio.addEventListener('playing', window.startVis); } initVisualizer();
 
-        function initParticles() {
-            particles = [];
-            for(let i=0; i<90; i++) {
-                particles.push({
-                    x: Math.random() * cw, y: Math.random() * ch,
-                    r: (decorState === 1 || decorState === 2) ? Math.random()*2 + 1 : Math.random()*2.5 + 1.5,
-                    s: (decorState === 1 || decorState === 2) ? Math.random()*0.5 + 0.2 : 0, 
-                    d: Math.random()*0.8,
-                    c: (decorState === 1 || decorState === 2) ? neonColors[Math.floor(Math.random()*neonColors.length)] : 'rgba(255,255,255,0.9)'
-                });
-            }
-        }
+        let userNotes = JSON.parse(localStorage.getItem('radio_notes')) || []; function renderNotes() { DOM.notesList.innerHTML = ''; if(userNotes.length === 0) { DOM.notesList.innerHTML = '<div style="text-align:center; color:var(--text-sub); font-size:12px; margin-top:10px;">No notes saved yet.</div>'; return; } userNotes.forEach((n, i) => { let li = document.createElement('li'); li.className = 'note-item'; li.innerHTML = `<div class="note-date">${n.date}</div><div class="note-text">${n.text}</div><button class="note-del" onclick="deleteNote(${i})"><i class="fas fa-trash"></i></button>`; DOM.notesList.appendChild(li); }); } window.deleteNote = function(i) { userNotes.splice(i, 1); localStorage.setItem('radio_notes', JSON.stringify(userNotes)); renderNotes(); }; DOM.saveNoteBtn.onclick = () => { let txt = DOM.noteInput.value.trim(); if(txt) { let d = new Date(); userNotes.unshift({ text: txt, date: d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US') }); localStorage.setItem('radio_notes', JSON.stringify(userNotes)); DOM.noteInput.value = ''; renderNotes(); } }; const toggleNotesSheet = () => { DOM.notesSheet.classList.toggle('open'); DOM.notesOverlay.classList.toggle('open'); renderNotes(); }; DOM.notesBtn.onclick = toggleNotesSheet; DOM.closeNotesBtn.onclick = toggleNotesSheet; DOM.notesOverlay.onclick = toggleNotesSheet;
 
-        let angle = 0;
-        function animateDecor() {
-            if (decorState === 0) { ctx.clearRect(0, 0, cw, ch); return; }
-            ctx.clearRect(0, 0, cw, ch);
-            angle += 0.01;
-            ctx.beginPath();
-            for(let i=0; i<particles.length; i++) {
-                let p = particles[i];
-                ctx.fillStyle = p.c;
-                ctx.moveTo(p.x, p.y);
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2, true);
-            }
-            ctx.fill();
-            for(let i=0; i<particles.length; i++) {
-                let p = particles[i];
-                if (decorState === 1 || decorState === 2) {
-                    p.y += p.s;
-                    p.x += Math.sin(angle + p.d) * 0.5;
-                } else if (decorState === 3 || decorState === 4) {
-                    p.y += Math.pow(p.d, 2) * 0.5 + 0.3; 
-                    p.x += Math.sin(angle + p.d) * 0.3;
-                }
-                if(p.y > ch) { particles[i] = { ...p, x: Math.random()*cw, y: -5 }; }
-            }
-        }
-        setInterval(animateDecor, 30);
-
-        DOM.decorToggleBtn.addEventListener('click', () => {
-            decorState = (decorState + 1) % 5;
-            if (decorState === 1 || decorState === 3) { document.querySelector('.player-card').insertBefore(decorCanvas, document.querySelector('.player-card').firstChild); } 
-            else if (decorState === 2 || decorState === 4) { document.body.prepend(decorCanvas); }
-            resizeCanvas();
-            if (decorState > 0) initParticles();
-            let icon = DOM.decorToggleBtn.querySelector('i');
-            if(decorState === 0) { icon.className = 'fas fa-magic'; DOM.decorToggleBtn.style.color = 'var(--text-sub)'; }
-            if(decorState === 1) { icon.className = 'fas fa-star'; DOM.decorToggleBtn.style.color = 'var(--warning)'; }
-            if(decorState === 2) { icon.className = 'fas fa-star'; DOM.decorToggleBtn.style.color = 'var(--primary)'; }
-            if(decorState === 3) { icon.className = 'fas fa-snowflake'; DOM.decorToggleBtn.style.color = '#fff'; }
-            if(decorState === 4) { icon.className = 'fas fa-snowflake'; DOM.decorToggleBtn.style.color = '#cbd5e1'; }
-        });
-
-        function initVisualizer() {
-            var visDiv = document.getElementById('cool-visualizer');
-            var html = '';
-            for(var i=0; i<20; i++){ html += '<div class=\"vis-bar\"></div>'; }
-            visDiv.innerHTML = html;
-            var bars = visDiv.querySelectorAll('.vis-bar');
-            var visTimer;
-            function renderFrame() {
-                if(DOM.audio.paused) return;
-                bars.forEach((bar, i) => { var dist = Math.abs(i - 12); var maxH = 26 - (dist * 1.0); var h = 4 + Math.random() * maxH; bar.style.height = h + 'px'; });
-                visTimer = setTimeout(renderFrame, 80 + Math.random() * 40);
-            }
-            window.startVis = function() { visDiv.classList.add('vis-active'); renderFrame(); };
-            window.stopVis = function() { visDiv.classList.remove('vis-active'); clearTimeout(visTimer); bars.forEach(b => b.style.height = '4px'); };
-            DOM.audio.addEventListener('play', window.startVis); DOM.audio.addEventListener('pause', window.stopVis); DOM.audio.addEventListener('waiting', window.stopVis); DOM.audio.addEventListener('playing', window.startVis);
-        }
-        initVisualizer();
-
-        let userNotes = JSON.parse(localStorage.getItem('radio_notes')) || [];
-        function renderNotes() {
-            DOM.notesList.innerHTML = '';
-            if(userNotes.length === 0) { DOM.notesList.innerHTML = '<div style="text-align:center; color:var(--text-sub); font-size:12px; margin-top:10px;">No notes saved yet.</div>'; return; }
-            userNotes.forEach((n, i) => {
-                let li = document.createElement('li'); li.className = 'note-item';
-                li.innerHTML = `<div class="note-date">${n.date}</div><div class="note-text">${n.text}</div><button class="note-del" onclick="deleteNote(${i})"><i class="fas fa-trash"></i></button>`;
-                DOM.notesList.appendChild(li);
-            });
-        }
-        window.deleteNote = function(i) { userNotes.splice(i, 1); localStorage.setItem('radio_notes', JSON.stringify(userNotes)); renderNotes(); };
-        DOM.saveNoteBtn.onclick = () => {
-            let txt = DOM.noteInput.value.trim();
-            if(txt) { let d = new Date(); userNotes.unshift({ text: txt, date: d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US') }); localStorage.setItem('radio_notes', JSON.stringify(userNotes)); DOM.noteInput.value = ''; renderNotes(); }
-        };
-        const toggleNotesSheet = () => { DOM.notesSheet.classList.toggle('open'); DOM.notesOverlay.classList.toggle('open'); renderNotes(); };
-        DOM.notesBtn.onclick = toggleNotesSheet; DOM.closeNotesBtn.onclick = toggleNotesSheet; DOM.notesOverlay.onclick = toggleNotesSheet;
-
-        async function fetchOTA() {}
-
-        function applyCustomPhoto(url) { 
-            if(url) { customImageUrl = url; DOM.logo.innerHTML = `<img src="${url}"/>`; DOM.addPhotoText.style.display = 'none'; DOM.removePhotoBtn.classList.add('visible'); } 
-            else { customImageUrl = null; DOM.logo.innerHTML = `<i class="fas fa-music"></i>`; DOM.removePhotoBtn.classList.remove('visible'); if (!isTextHidden) { DOM.addPhotoText.style.display = 'block'; DOM.removePhotoBtn.classList.add('visible'); } } 
-        }
-        if(!isTextHidden || customImageUrl) { DOM.removePhotoBtn.classList.add('visible'); }
-        DOM.logoWrapper.addEventListener('click', () => { DOM.customPhotoInput.click(); });
-        DOM.customPhotoInput.addEventListener('change', e => { const file = e.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = (ev) => { const originalUrl = ev.target.result; applyCustomPhoto(originalUrl); try { localStorage.setItem('radio_custom_photo', originalUrl); } catch(err) {} }; reader.readAsDataURL(file); } });
-        DOM.removePhotoBtn.addEventListener('click', () => { if (customImageUrl) { localStorage.removeItem('radio_custom_photo'); applyCustomPhoto(null); DOM.customPhotoInput.value = ''; } else { DOM.addPhotoText.style.display = 'none'; DOM.removePhotoBtn.classList.remove('visible'); isTextHidden = true; localStorage.setItem('radio_hide_text', 'true'); } });
+        function applyCustomPhoto(url) { if(url) { customImageUrl = url; DOM.logo.innerHTML = `<img src="${url}"/>`; DOM.addPhotoText.style.display = 'none'; DOM.removePhotoBtn.classList.add('visible'); } else { customImageUrl = null; DOM.logo.innerHTML = `<i class="fas fa-music"></i>`; DOM.removePhotoBtn.classList.remove('visible'); if (!isTextHidden) { DOM.addPhotoText.style.display = 'block'; DOM.removePhotoBtn.classList.add('visible'); } } } if(!isTextHidden || customImageUrl) { DOM.removePhotoBtn.classList.add('visible'); } DOM.logoWrapper.addEventListener('click', () => { DOM.customPhotoInput.click(); }); DOM.customPhotoInput.addEventListener('change', e => { const file = e.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = (ev) => { const originalUrl = ev.target.result; applyCustomPhoto(originalUrl); try { localStorage.setItem('radio_custom_photo', originalUrl); } catch(err) {} }; reader.readAsDataURL(file); } }); DOM.removePhotoBtn.addEventListener('click', () => { if (customImageUrl) { localStorage.removeItem('radio_custom_photo'); applyCustomPhoto(null); DOM.customPhotoInput.value = ''; } else { DOM.addPhotoText.style.display = 'none'; DOM.removePhotoBtn.classList.remove('visible'); isTextHidden = true; localStorage.setItem('radio_hide_text', 'true'); } });
 
         let timers = { sleepEnd: null, startEnd: null, tickInt: null, sleepTo: null, startTo: null }; const toggleTimerSheet = () => { DOM.timerSheet.classList.toggle('open'); DOM.timerOverlay.classList.toggle('open'); }; DOM.timersToggleBtn.addEventListener('click', toggleTimerSheet); DOM.closeTimerBtn.addEventListener('click', toggleTimerSheet); DOM.timerOverlay.addEventListener('click', toggleTimerSheet); const formatTime = (totalSeconds) => { const h = Math.floor(totalSeconds / 3600); const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0'); const s = (totalSeconds % 60).toString().padStart(2, '0'); return h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`; }; const getRemaining = (endMs) => { if (!endMs) return { total: 0 }; return { total: Math.max(0, Math.round((endMs - Date.now()) / 1000)) }; }; const updateHeaderTimerUI = () => { const sleepActive = timers.sleepEnd && Date.now() < timers.sleepEnd; const startActive = timers.startEnd && Date.now() < timers.startEnd; if (sleepActive) { const rem = getRemaining(timers.sleepEnd); const timeStr = formatTime(rem.total); DOM.mainHeaderTimer.textContent = timeStr; DOM.sheetHeaderTimer.textContent = `(Sleep: ${timeStr})`; DOM.timersToggleBtn.classList.add('has-text', 'active-timer'); DOM.sleepDigital.textContent = timeStr; } else if (startActive) { const rem = getRemaining(timers.startEnd); const timeStr = formatTime(rem.total); DOM.mainHeaderTimer.textContent = timeStr; DOM.sheetHeaderTimer.textContent = `(Start: ${timeStr})`; DOM.timersToggleBtn.classList.add('has-text', 'active-timer'); DOM.startDigital.textContent = timeStr; } else { DOM.mainHeaderTimer.textContent = ''; DOM.sheetHeaderTimer.textContent = ''; DOM.timersToggleBtn.classList.remove('has-text', 'active-timer'); } }; const stopEngine = () => { if(timers.tickInt) { clearInterval(timers.tickInt); timers.tickInt = null; } }; const startEngine = () => { if (!timers.tickInt) timers.tickInt = setInterval(timerTick, 1000); timerTick(); }; const clearSleepUI = () => { clearTimeout(timers.sleepTo); timers.sleepTo = null; timers.sleepEnd = null; DOM.sleepDigital.classList.remove('visible'); DOM.sleepCancelBtn.classList.remove('visible'); updateHeaderTimerUI(); }; const clearStartUI = () => { clearTimeout(timers.startTo); timers.startTo = null; timers.startEnd = null; DOM.startDigital.classList.remove('visible'); DOM.startCancelBtn.classList.remove('visible'); updateHeaderTimerUI(); }; const timerTick = () => { const sleepActive = timers.sleepEnd && Date.now() < timers.sleepEnd; const startActive = timers.startEnd && Date.now() < timers.startEnd; if (!sleepActive && !startActive) { stopEngine(); updateHeaderTimerUI(); return; } if (sleepActive) { const rem = getRemaining(timers.sleepEnd); if (rem.total <= 0) { audioController.fadeOut(); clearSleepUI(); } } else if (timers.sleepEnd) { clearSleepUI(); } if (startActive) { const rem = getRemaining(timers.startEnd); if (rem.total <= 0) { audioController.forceStart(); clearStartUI(); } } else if (timers.startEnd) { clearStartUI(); } updateHeaderTimerUI(); }; DOM.sleepActions.addEventListener('click', e => { if(e.target.tagName !== 'BUTTON') return; const mins = parseInt(e.target.dataset.min); if (mins) { if(timers.startEnd) clearStartUI(); audioController.forceStart(); const now = Date.now(); timers.sleepEnd = (timers.sleepEnd && timers.sleepEnd > now) ? timers.sleepEnd + (mins * 60000) : now + (mins * 60000); DOM.sleepCancelBtn.classList.add('visible'); DOM.sleepDigital.classList.add('visible'); startEngine(); clearTimeout(timers.sleepTo); const remainingMs = timers.sleepEnd - Date.now(); timers.sleepTo = setTimeout(() => { audioController.fadeOut(); clearSleepUI(); }, remainingMs); } }); DOM.startActions.addEventListener('click', e => { if(e.target.tagName !== 'BUTTON') return; const mins = parseInt(e.target.dataset.min); if (mins) { if(timers.sleepEnd) clearSleepUI(); const now = Date.now(); timers.startEnd = (timers.startEnd && timers.startEnd > now) ? timers.startEnd + (mins * 60000) : now + (mins * 60000); DOM.startCancelBtn.classList.add('visible'); DOM.startDigital.classList.add('visible'); startEngine(); clearTimeout(timers.startTo); const remainingMs = timers.startEnd - Date.now(); timers.startTo = setTimeout(() => { audioController.forceStart(); clearStartUI(); }, remainingMs); } }); DOM.sleepCancelBtn.addEventListener('click', clearSleepUI); DOM.startCancelBtn.addEventListener('click', clearStartUI);
         const themes = [ { name: 'Royal Blue', primary: '#3b82f6', bg: '#0f172a', cardBg: 'rgba(30, 41, 59, 0.7)' }, { name: 'Emerald', primary: '#10b981', bg: '#022c22', cardBg: 'rgba(6, 78, 59, 0.7)' }, { name: 'Crimson', primary: '#ef4444', bg: '#2d0a0a', cardBg: 'rgba(127, 29, 29, 0.7)' }, { name: 'Amber', primary: '#f59e0b', bg: '#2d1f04', cardBg: 'rgba(180, 83, 9, 0.6)' }, { name: 'Sky', primary: '#0ea5e9', bg: '#0a2a3b', cardBg: 'rgba(14, 116, 144, 0.6)' }, { name: 'Violet', primary: '#8b5cf6', bg: '#1e1033', cardBg: 'rgba(109, 40, 217, 0.6)' }, { name: 'Rose', primary: '#f43f5e', bg: '#2d0a14', cardBg: 'rgba(159, 18, 57, 0.7)' }, { name: 'Teal', primary: '#14b8a6', bg: '#042f2e', cardBg: 'rgba(20, 184, 166, 0.5)' }, { name: 'Indigo', primary: '#6366f1', bg: '#0f0f23', cardBg: 'rgba(79, 70, 229, 0.6)' }, { name: 'Lime', primary: '#84cc16', bg: '#1a2e0a', cardBg: 'rgba(101, 163, 13, 0.6)' }, { name: 'Fuchsia', primary: '#d946ef', bg: '#2a0a2e', cardBg: 'rgba(192, 38, 211, 0.5)' }, { name: 'Orange', primary: '#f97316', bg: '#2d1a05', cardBg: 'rgba(194, 65, 12, 0.7)' } ]; function applyTheme(theme) { document.documentElement.style.setProperty('--primary', theme.primary); document.documentElement.style.setProperty('--primary-hover', theme.primary + 'cc'); document.documentElement.style.setProperty('--bg-base', theme.bg); document.documentElement.style.setProperty('--card-bg', theme.cardBg); localStorage.setItem('radio_theme', JSON.stringify(theme)); } function loadTheme() { const saved = localStorage.getItem('radio_theme'); if (saved) { try { applyTheme(JSON.parse(saved)); } catch(e){ applyTheme(themes[0]); } } else { applyTheme(themes[0]); } } function renderThemeButtons() { DOM.themeColors.innerHTML = themes.map(t => `<button class="theme-color-btn" style="background:${t.primary};" title="${t.name}" data-theme='${JSON.stringify(t)}'></button>` ).join(''); DOM.themeColors.querySelectorAll('button').forEach(btn => { btn.addEventListener('click', () => { const theme = JSON.parse(btn.dataset.theme); applyTheme(theme); DOM.themeSheet.classList.remove('open'); DOM.themeOverlay.classList.remove('open'); }); }); } const toggleThemeSheet = () => { DOM.themeSheet.classList.toggle('open'); DOM.themeOverlay.classList.toggle('open'); }; DOM.themeBtn.addEventListener('click', toggleThemeSheet); DOM.closeThemeBtn.addEventListener('click', toggleThemeSheet); DOM.themeOverlay.addEventListener('click', toggleThemeSheet); renderThemeButtons(); loadTheme();
@@ -494,7 +361,6 @@
         const checkFavState = id => { const fav = savedStations.some(s => s.id === id); DOM.saveBtn.className = fav ? 'action-btn active-fav' : 'action-btn'; DOM.saveBtn.innerHTML = fav ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>'; }; DOM.saveBtn.addEventListener('click', () => { const current = isExternalFavPlaying ? savedStations.find(s => s.url === DOM.audio.src) : stations[currentIndex]; if(!current) return; const stId = current.stationuuid || current.id; const existIdx = savedStations.findIndex(s => s.id === stId); if (existIdx > -1) { savedStations.splice(existIdx, 1); } else { savedStations.push({ id: stId, name: current.name, url: current.url_resolved || current.url, country: current.country || TARGET_COUNTRY }); } localStorage.setItem('radio_saved_list', JSON.stringify(savedStations)); checkFavState(stId); renderFavorites(); }); const renderFavorites = () => { DOM.favList.innerHTML = savedStations.length ? '' : '<li style="text-align:center; color:var(--text-sub); margin-top:20px;">No saved stations.</li>'; savedStations.forEach((f, i) => { const li = document.createElement('li'); li.className = 'fav-item'; const countryText = f.country ? ` (${f.country})` : ''; li.innerHTML = `<div class="fav-item-content"><i class="fas fa-play-circle fav-play-icon"></i><div class="fav-info" title="${f.name}">${f.name || 'Unknown'}${countryText}</div></div><button class="fav-remove" title="Remove"><i class="fas fa-trash-alt"></i></button>`; li.querySelector('.fav-item-content').addEventListener('click', () => { DOM.favModal.classList.remove('open'); const idx = stations.findIndex(s => s.stationuuid === f.id); if(idx > -1) { UIController.loadIndex(idx); audioController.play(); } else { UIController.loadExternalFav(f); } }); li.querySelector('.fav-remove').addEventListener('click', e => { e.stopPropagation(); savedStations.splice(i, 1); localStorage.setItem('radio_saved_list', JSON.stringify(savedStations)); renderFavorites(); const activeId = isExternalFavPlaying ? f.id : (stations[currentIndex]?.stationuuid); if (activeId === f.id) checkFavState(f.id); }); DOM.favList.appendChild(li); }); }; DOM.openFavs.addEventListener('click', () => { renderFavorites(); DOM.favModal.classList.add('open'); }); DOM.closeFavs.addEventListener('click', () => DOM.favModal.classList.remove('open'));
 
         async function bootApp() {
-            await fetchOTA(); 
             if (customImageUrl) { applyCustomPhoto(customImageUrl); } else if (isTextHidden) { DOM.addPhotoText.style.display = 'none'; }
             DOM.headerCountry.textContent = TARGET_COUNTRY || 'Global Radio';
             if(!TARGET_COUNTRY || TARGET_COUNTRY.length < 2) { UIController.emptyState(); DOM.loading.style.display = 'none'; return; }
@@ -503,27 +369,14 @@
             DOM.loading.style.display = 'none';
         }
 
-        let totalListenSeconds = parseInt(localStorage.getItem('radio_listen_time')) || 0;
-        let listenTimerInterval = null;
-        const listenTimeDisplay = document.getElementById('listenTimeDisplay');
-        function formatListenTime(secs) {
-            let y = Math.floor(secs / 31536000), mo = Math.floor((secs % 31536000) / 2592000), d = Math.floor((secs % 2592000) / 86400), h = Math.floor((secs % 86400) / 3600), m = Math.floor((secs % 3600) / 60), s = Math.floor(secs % 60);
-            const pad = num => num.toString().padStart(2, '0');
-            return `${pad(y)} : ${pad(mo)} : ${pad(d)} : ${pad(h)} : ${pad(m)} : ${pad(s)}`;
-        }
+        let totalListenSeconds = parseInt(localStorage.getItem('radio_listen_time')) || 0; let listenTimerInterval = null; const listenTimeDisplay = document.getElementById('listenTimeDisplay');
+        function formatListenTime(secs) { let y = Math.floor(secs / 31536000), mo = Math.floor((secs % 31536000) / 2592000), d = Math.floor((secs % 2592000) / 86400), h = Math.floor((secs % 86400) / 3600), m = Math.floor((secs % 3600) / 60), s = Math.floor(secs % 60); const pad = num => num.toString().padStart(2, '0'); return `${pad(y)} : ${pad(mo)} : ${pad(d)} : ${pad(h)} : ${pad(m)} : ${pad(s)}`; }
         if(listenTimeDisplay) listenTimeDisplay.innerText = formatListenTime(totalListenSeconds);
-        function startListeningTimer() {
-            if (listenTimerInterval) return;
-            listenTimerInterval = setInterval(() => { totalListenSeconds++; if(listenTimeDisplay) listenTimeDisplay.innerText = formatListenTime(totalListenSeconds); if (totalListenSeconds % 5 === 0) localStorage.setItem('radio_listen_time', totalListenSeconds); }, 1000);
-        }
+        function startListeningTimer() { if (listenTimerInterval) return; listenTimerInterval = setInterval(() => { totalListenSeconds++; if(listenTimeDisplay) listenTimeDisplay.innerText = formatListenTime(totalListenSeconds); if (totalListenSeconds % 5 === 0) localStorage.setItem('radio_listen_time', totalListenSeconds); }, 1000); }
         function stopListeningTimer() { if (listenTimerInterval) { clearInterval(listenTimerInterval); listenTimerInterval = null; localStorage.setItem('radio_listen_time', totalListenSeconds); } }
-        DOM.audio.addEventListener('playing', startListeningTimer); DOM.audio.addEventListener('pause', stopListeningTimer); DOM.audio.addEventListener('waiting', stopListeningTimer);
-
-        bootApp();
-
+        DOM.audio.addEventListener('playing', startListeningTimer); DOM.audio.addEventListener('pause', stopListeningTimer); DOM.audio.addEventListener('waiting', stopListeningTimer); bootApp();
         const countryFlags = ["🏴󠁧󠁢󠁷󠁬󠁳󠁿","🏴󠁧󠁢󠁳󠁣󠁴󠁿","🏴󠁧󠁢󠁥󠁮󠁧󠁿","🇿🇼","🇿🇲","🇿🇦","🇻🇮","🇻🇳","🇻🇺","🇼🇫","🇼🇸","🇽🇰","🇾🇪","🇾🇹","🇻🇬","🇻🇪","🇻🇨","🇻🇦","🇺🇿","🇺🇾","🇺🇸","🇺🇳","🇹🇷","🇹🇹","🇹🇻","🇹🇼","🇹🇿","🇺🇦","🇺🇬","🇺🇲","🇹🇴","🇹🇳","🇹🇲","🇹🇱","🇹🇰","🇹🇯","🇹🇭","🇹🇬","🇸🇻","🇸🇽","🇸🇾","🇸🇿","🇹🇦","🇹🇨","🇹🇩","🇹🇫","🇸🇹","🇸🇸","🇸🇷","🇸🇴","🇸🇳","🇸🇲","🇸🇱","🇸🇰","🇸🇧","🇸🇨","🇸🇩","🇸🇪","🇸🇬","🇸🇭","🇸🇮","🇸🇯","🇸🇦","🇷🇼","🇷🇺","🇷🇸","🇷🇴","🇷🇪","🇶🇦","🇵🇾","🇵🇰","🇵🇱","🇵🇲","🇵🇳","🇵🇷","🇵🇸","🇵🇹","🇵🇼","🇵🇭","🇵🇬","🇵🇫","🇵🇪","🇵🇦","🇴🇲","🇳🇿","🇳🇺","🇳🇪","🇳🇫","🇳🇬","🇳🇮","🇳🇱","🇳🇴","🇳🇵","🇳🇷","🇳🇨","🇳🇦","🇲🇿","🇲🇾","🇲🇽","🇲🇼","🇲🇻","🇲🇺","🇲🇲","🇲🇳","🇲🇴","🇲🇵","🇲🇶","🇲🇷","🇲🇸","🇲🇹","🇲🇱","🇲🇰","🇲🇭","🇲🇬","🇲🇫","🇲🇪","🇲🇩","🇲🇨","🇱🇰","🇱🇷","🇱🇸","🇱🇹","🇱🇺","🇱🇻","🇱🇾","🇲🇦","🇱🇮","🇱🇨","🇱🇧","🇱🇦","🇰🇿","🇰🇾","🇰🇼","🇰🇷","🇯🇵","🇰🇪","🇰🇬","🇰🇭","🇰🇮","🇰🇲","🇰🇳","🇰🇵","🇯🇴","🇯🇲","🇯🇪","🇮🇹","🇮🇸","🇮🇷","🇮🇶","🇮🇴","🇭🇹","🇭🇺","🇮🇨","🇮🇩","🇮🇪","🇮🇱","🇮🇲","🇮🇳","🇭🇷","🇭🇳","🇭🇲","🇭🇰","🇬🇾","🇬🇼","🇬🇺","🇬🇹","🇬🇮","🇬🇱","🇬🇲","🇬🇳","🇬🇵","🇬🇶","🇬🇷","🇬🇷","🇬🇸","🇬🇭","🇬🇬","🇬🇫","🇬🇪","🇬🇩","🇬🇧","🇬🇦","🇫🇷","🇪🇸","🇪🇹","🇪🇺","🇫🇮","🇫🇯","🇫🇰","🇫🇲","🇫🇴","🇪🇷","🇪🇭","🇪🇬","🇪🇪","🇪🇨","🇪🇦","🇩🇿","🇩🇴","🇨🇽","🇨🇾","🇨🇿","🇩🇪","🇩🇬","🇩🇯","🇩🇰","🇩🇲","🇨🇼","🇨🇻","🇨🇺","🇨🇷","🇨🇶","🇨🇵","🇨🇴","🇨🇳","🇨🇩","🇨🇫","🇨🇬","🇨🇭","🇨🇮","🇨🇰","🇨🇱","🇨🇲","🇨🇨","🇨🇦","🇧🇿","🇧🇾","🇧🇼","🇧🇻","🇧🇹","🇧🇸","🇧🇮","🇧🇯","🇧🇱","🇧🇲","🇧🇳","🇧🇴","🇧🇶","🇧🇷","🇧🇭","🇧🇬","🇧🇫","🇧🇪","🇧🇩","🇧🇧","🇧🇦","🇦🇿","🇦🇴","🇦🇶","🇦🇷","🇦🇸","🇦🇹","🇦🇺","🇦🇼","🇦🇽","🇦🇲","🇦🇱","🇦🇮","🇦🇬","🇦🇫","🇦🇪","🇦🇩","🇦🇨"];
 
-        // --- 🎮 محرك لعبة Flappy Note ---
         (function initGameModule() {
             try {
                 const gameToggleBtn = document.getElementById('gameToggleBtn'); const gameContainer = document.getElementById('gameContainer'); const gameCanvas = document.getElementById('gameCanvas'); const gameOverUI = document.getElementById('gameOverUI'); const gameScoreEl = document.getElementById('gameScore'); const retryBtn = document.getElementById('retryBtn');
@@ -578,105 +431,174 @@
         });
         DOM.vol.addEventListener('input', () => { if (tg && tg.HapticFeedback && Math.random() > 0.4) { tg.HapticFeedback.impactOccurred('medium'); } });
 
-        // --- 🖨️ محرك تحويل الصورة إلى PDF والصور والطباعة ---
-        (function initPrintModule() {
+        // --- 🖨️ أستوديو الطباعة والـ PDF الجديد والمتطور (متعدد الصفحات وبدون إطار) ---
+        (function initPrintStudio() {
             const printModal = document.getElementById('printModal');
             document.getElementById('openPrintBtn').addEventListener('click', () => printModal.classList.add('open'));
             document.getElementById('closePrintBtn').addEventListener('click', () => printModal.classList.remove('open'));
 
-            let currentStickerImg = null;
-            let isStickerEcoMode = false;
-            const stickerPaper = document.getElementById('stickerPaper');
-            const printPlaceholder = document.getElementById('printPlaceholder');
+            let imgList = [];
+            let isBW = false;
+            const previewArea = document.getElementById('printPreviewArea');
+            const emptyText = document.getElementById('emptyPreviewText');
+            const btnToggleBW = document.getElementById('btnToggleBW');
 
-            window.clearStickerPaper = function() {
-                stickerPaper.innerHTML = "";
-                stickerPaper.style.opacity = '0';
-                printPlaceholder.style.display = 'block';
-                currentStickerImg = null;
+            function updatePreviewUI() {
+                if (imgList.length === 0) {
+                    previewArea.innerHTML = '';
+                    previewArea.appendChild(emptyText);
+                    emptyText.textContent = `No images added. Pages: 0`;
+                    return;
+                }
+                previewArea.innerHTML = '';
+                imgList.forEach((src, idx) => {
+                    const wrap = document.createElement('div');
+                    wrap.className = `thumb-wrap ${isBW ? 'bw-active' : ''}`;
+                    wrap.innerHTML = `
+                        <img src="${src}" alt="Page ${idx+1}">
+                        <button class="thumb-del" onclick="removeImage(${idx})"><i class="fas fa-times"></i></button>
+                    `;
+                    previewArea.appendChild(wrap);
+                });
+            }
+
+            window.removeImage = function(idx) {
+                imgList.splice(idx, 1);
+                updatePreviewUI();
             };
 
-            window.populateStickerPaper = function(imgSrc) {
-                const testImg = new Image();
-                testImg.crossOrigin = "anonymous";
-                testImg.onload = () => {
-                    currentStickerImg = imgSrc;
-                    printPlaceholder.style.display = 'none';
-                    stickerPaper.style.opacity = '1';
-                    
-                    // استخدام object-fit: cover لتمتد الصورة بشكل كامل وتقضي على الإطار الأبيض
-                    stickerPaper.innerHTML = `<img src="${imgSrc}" crossorigin="anonymous">`;
-                };
-                testImg.onerror = () => { alert("⚠️ Failed to load the image."); clearStickerPaper(); };
-                testImg.src = imgSrc;
+            function processIncomingImage(src) {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => { imgList.push(src); updatePreviewUI(); };
+                img.onerror = () => alert("⚠️ Failed to load the image.");
+                img.src = src;
+            }
+
+            window.addFromUrl = function() {
+                const url = document.getElementById('pImageUrl').value;
+                if (url) { processIncomingImage(url); document.getElementById('pImageUrl').value = ''; }
             };
 
-            window.loadStickerFromUrl = function() {
-                const url = document.getElementById('stickerImageUrl').value;
-                if (url) populateStickerPaper(url);
-            };
-
-            window.loadStickerFromFile = function(event) {
-                const file = event.target.files[0];
-                if (file) {
+            window.addFromGallery = function(event) {
+                const files = event.target.files;
+                if (!files || files.length === 0) return;
+                Array.from(files).forEach(file => {
                     const reader = new FileReader();
-                    reader.onload = e => populateStickerPaper(e.target.result);
+                    reader.onload = e => processIncomingImage(e.target.result);
                     reader.readAsDataURL(file);
-                }
+                });
+                event.target.value = ''; // Reset input
             };
 
-            window.toggleStickerEcoMode = function() {
-                const ecoBtn = document.getElementById('stickerEcoBtn');
-                isStickerEcoMode = !isStickerEcoMode;
-                if(isStickerEcoMode) {
-                    stickerPaper.classList.add('eco-mode');
-                    ecoBtn.innerHTML = "🎨 Color Mode";
+            window.togglePrintBW = function() {
+                isBW = !isBW;
+                if(isBW) {
+                    btnToggleBW.classList.add('active');
+                    btnToggleBW.innerHTML = "🎨 Color Mode";
                 } else {
-                    stickerPaper.classList.remove('eco-mode');
-                    ecoBtn.innerHTML = "🌿 Black & White (Eco)";
+                    btnToggleBW.classList.remove('active');
+                    btnToggleBW.innerHTML = "🖤 B&W Mode";
                 }
+                updatePreviewUI();
             };
 
-            // دالة تنزيل الصورة
-            window.downloadStickerImage = async function() {
-                if (!currentStickerImg) return alert("Please add an image first.");
-                const btn = document.getElementById('dlImgBtn');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '⏳...';
-                try {
-                    const canvas = await html2canvas(stickerPaper, {
-                        scale: 3, useCORS: true,
-                        onclone: (doc) => doc.getElementById('stickerPaper').style.transform = 'none'
-                    });
+            // خوارزمية المعالجة الذكية للملء المثالي (A4 Cover Crop) وحذف الحواف البيضاء!
+            function getProcessedBase64(src) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        // أبعاد A4 بدقة ممتازة لتفادي الإطار (1404x1986)
+                        canvas.width = 1404;
+                        canvas.height = 1986;
+                        const ctx = canvas.getContext('2d');
+                        
+                        // تطبيق فلتر الأبيض والأسود إن كان مفعلاً
+                        if (isBW) ctx.filter = 'grayscale(100%) contrast(150%)';
+                        
+                        // خلفية سوداء احتياطية تندمج مع صور الفضاء/الليل
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        // حساب القص الذكي (Cover) بدون تشويه الصورة
+                        const hRatio = canvas.width / img.width;
+                        const vRatio = canvas.height / img.height;
+                        const ratio = Math.max(hRatio, vRatio);
+                        const centerShift_x = (canvas.width - img.width * ratio) / 2;
+                        const centerShift_y = (canvas.height - img.height * ratio) / 2;
+
+                        ctx.drawImage(img, 0, 0, img.width, img.height, centerShift_x, centerShift_y, img.width*ratio, img.height*ratio);
+                        resolve(canvas.toDataURL('image/jpeg', 0.95));
+                    };
+                    img.src = src;
+                });
+            }
+
+            // تحميل كل الصور
+            window.downloadAllImages = async function() {
+                if(imgList.length === 0) return alert("Add images first!");
+                const btn = document.getElementById('btnDlImg'); const txt = btn.innerHTML; btn.innerHTML = "⏳...";
+                for(let i = 0; i < imgList.length; i++) {
+                    const dataUrl = await getProcessedBase64(imgList[i]);
                     const link = document.createElement('a');
-                    link.download = 'Document_Image.png';
-                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.download = `Page_${i+1}.jpg`;
+                    link.href = dataUrl;
                     link.click();
-                } catch (err) { alert("Error generating image."); }
-                // إعادة الزر لشكله الطبيعي (لحل مشكلة اختفاء الصورة أو توقف النظام)
-                btn.innerHTML = originalText;
+                    await new Promise(r => setTimeout(r, 400)); // فاصل زمني صغير
+                }
+                btn.innerHTML = txt;
             };
 
-            // دالة تنزيل الـ PDF
-            window.downloadStickerPDF = async function() {
-                if (!currentStickerImg) return alert("Please add an image first.");
-                const btn = document.getElementById('dlPdfBtn');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '⏳...';
+            // تحميل PDF بدون هوامش وبصفحات متعددة
+            window.generateBorderlessPDF = async function() {
+                if(imgList.length === 0) return alert("Add images first!");
+                const btn = document.getElementById('btnDlPdf'); const txt = btn.innerHTML; btn.innerHTML = "⏳...";
                 try {
-                    const canvas = await html2canvas(stickerPaper, {
-                        scale: 3, useCORS: true,
-                        onclone: (doc) => doc.getElementById('stickerPaper').style.transform = 'none'
-                    });
-                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    // تم وضع الأبعاد لتمتد من حافة لحافة دون هوامش (0,0)
-                    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+                    const w = pdf.internal.pageSize.getWidth(); // 210
+                    const h = pdf.internal.pageSize.getHeight(); // 297
+
+                    for(let i = 0; i < imgList.length; i++) {
+                        if(i > 0) pdf.addPage();
+                        const imgData = await getProcessedBase64(imgList[i]);
+                        // وضع الصورة من الحافة للحافة تماماً
+                        pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
+                    }
                     pdf.save("Document.pdf");
-                } catch (err) { alert("Error generating PDF."); }
-                // إعادة الزر لشكله الطبيعي
-                btn.innerHTML = originalText;
+                } catch(e) { alert("Error"); }
+                btn.innerHTML = txt;
+            };
+
+            // الطباعة المباشرة المتعددة باستخدام إطار مخفي
+            window.printBorderless = async function() {
+                if(imgList.length === 0) return alert("Add images first!");
+                const btn = document.getElementById('btnPrint'); const txt = btn.innerHTML; btn.innerHTML = "⏳...";
+                
+                let printHtml = '<html><head><style>@page{margin:0;size:A4 portrait;} body{margin:0;background:#000;} img{width:210mm;height:297mm;object-fit:cover;page-break-after:always;display:block;}</style></head><body>';
+                
+                for(let i=0; i<imgList.length; i++) {
+                    const b64 = await getProcessedBase64(imgList[i]);
+                    printHtml += `<img src="${b64}">`;
+                }
+                printHtml += '</body></html>';
+
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(printHtml);
+                iframe.contentWindow.document.close();
+                
+                setTimeout(() => {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                    btn.innerHTML = txt;
+                    setTimeout(() => document.body.removeChild(iframe), 2000);
+                }, 500);
             };
         })();
     </script>
