@@ -167,17 +167,22 @@
         .game-over-ui button { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; transition: 0.3s; }
         .game-over-ui button:hover { transform: scale(1.05); }
 
-        .print-preview-container { width: 100%; height: 260px; overflow: hidden; position: relative; background-color: #e0e0e0; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed var(--hint-color); margin-bottom: 15px; }
-        #printPlaceholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--hint-color); font-size: 14px; text-align: center; width: 80%; pointer-events: none; }
-        .a4-paper-mini { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: absolute; opacity: 0; transition: opacity 0.3s; overflow: hidden; }
+        /* --- إضافات تصميم طباعة وتحويل الصورة إلى PDF (تعديل الهوامش) --- */
+        .print-preview-container { width: 100%; height: 260px; overflow: hidden; position: relative; background-color: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed var(--hint-color); margin-bottom: 15px; }
+        #printPlaceholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--hint-color); font-size: 14px; text-align: center; width: 80%; pointer-events: none; z-index: 2; }
+        
+        /* إزالة أي Padding لضمان تمدد الصورة للأطراف */
+        .a4-paper-mini { width: 210mm; height: 297mm; background-color: transparent; padding: 0 !important; box-sizing: border-box; display: flex; justify-content: center; align-items: center; transform: scale(0.22); transform-origin: center; position: absolute; opacity: 0; transition: opacity 0.3s; overflow: hidden; }
+        
+        /* الصورة نفسها (object-fit: cover) لتمتد وتلغي الحواف البيضاء */
+        .a4-paper-mini img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s; display: block; }
+        
+        /* فلتر الأسود والأبيض */
         .eco-mode img { filter: grayscale(100%) contrast(150%) brightness(110%); }
+
         .print-input-group { display: flex; gap: 10px; margin-bottom: 10px; width: 100%; }
         .print-input-group input { flex: 1; padding: 10px; border: 1px solid var(--border-glass); border-radius: 8px; background: rgba(255,255,255,0.05); color: #fff; outline: none; }
-        .print-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; width: 100%; }        #printPlaceholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--hint-color); font-size: 14px; text-align: center; width: 80%; pointer-events: none; }
-        .a4-paper-mini { width: 210mm; height: 297mm; background-color: white; padding: 5mm; box-sizing: border-box; display: flex; justify-content: center; align-items: center; transform: scale(0.22); transform-origin: top center; position: absolute; opacity: 0; transition: opacity 0.3s; }
-        .print-input-group { display: flex; gap: 10px; margin-bottom: 10px; width: 100%; }
-        .print-input-group input { flex: 1; padding: 10px; border: 1px solid var(--border-glass); border-radius: 8px; background: rgba(255,255,255,0.05); color: #fff; outline: none; }
-        .print-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; width: 100%; }
+        .print-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; width: 100%; }
         
         @media print {
             body { background: white !important; margin: 0 !important; padding: 0 !important; background-image: none !important; }
@@ -205,8 +210,8 @@
                 <button class="icon-btn" id="decorToggleBtn" title="Toggle Decorations"><i class="fas fa-magic"></i></button>
                 <button class="icon-btn" id="removePhotoBtn" title="Remove Photo"><i class="fas fa-trash-alt"></i></button>
                 <button class="icon-btn" id="gameToggleBtn" title="Play Game" style="color: var(--warning);"><i class="fas fa-gamepad"></i></button>
-                <!-- زر الطباعة والـ PDF المخصص -->
-                <button class="icon-btn" id="openPrintBtn" title="Print / PDF Document" style="color: #a855f7;"><i class="fas fa-print"></i></button>
+                <!-- زر الطباعة -->
+                <button class="icon-btn" id="openPrintBtn" title="Print / Document Mode" style="color: #a855f7;"><i class="fas fa-print"></i></button>
             </div>
             
             <div class="header-country" id="headerCountry">Global Radio</div>
@@ -293,21 +298,19 @@
         </div>
     </div>
 
-    <!-- نافذة تحويل الصورة إلى PDF وطباعتها -->
+    <!-- نافذة تحويل الصورة إلى PDF (بدون هوامش) -->
     <div class="modal" id="printModal" style="overflow-y: auto;">
         <div class="modal-header">
-            <span>🖨️ Image to PDF / Print</span>
+            <span>🖨️ Image to PDF</span>
             <button class="close-modal" id="closePrintBtn"><i class="fas fa-times"></i></button>
         </div>
         
         <div class="print-preview-container" id="printPreviewArea">
-            <div id="printPlaceholder">Please upload an image or paste a URL</div>
-            <!-- ورقة واحدة فقط بالكامل -->
+            <div id="printPlaceholder">Please upload an image</div>
+            <!-- الورقة الأساسية للصورة -->
             <div class="a4-paper-mini" id="stickerPaper"></div>
         </div>
 
-
-        
         <div class="print-controls-wrapper" style="display: flex; flex-direction: column; width: 100%;">
             <div class="print-input-group">
                 <input type="text" id="stickerImageUrl" placeholder="Paste image URL here...">
@@ -318,18 +321,19 @@
                 <button style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold;">📁 Upload from Gallery</button>
                 <input type="file" id="stickerImageInput" accept="image/*" onchange="loadStickerFromFile(event)" style="font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%;">
             </div>
+
+            <!-- إرجاع زر الأسود والأبيض كما طلبت -->
+            <button onclick="toggleStickerEcoMode()" id="stickerEcoBtn" style="background: linear-gradient(45deg, #475569 0%, #cbd5e1 100%); color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 5px;">🌿 Black & White (Eco)</button>
             
-            <!-- زر الأبيض والأسود عاد من جديد -->
-            <button onclick="toggleStickerEcoMode()" id="stickerEcoBtn" style="background: linear-gradient(45deg, #a1c4fd 0%, #c2e9fb 100%); color: #333; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer;">🌿 Eco Mode (B&W)</button>
-            
+            <!-- أزرار التنزيل (صورة + PDF) -->
             <div class="print-btn-row">
-                <!-- زر تحميل الصورة عاد من جديد -->
                 <button id="dlImgBtn" onclick="downloadStickerImage()" style="background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">⬇️ Image</button>
                 <button id="dlPdfBtn" onclick="downloadStickerPDF()" style="background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">📄 PDF</button>
             </div>
-            <button onclick="window.print()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;">🖨️ Print Direct</button>
+            
+            <!-- زر الطباعة -->
+            <button onclick="window.print()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;">🖨️ Print Direct</button>
         </div>
-    </div>
     </div>
 
     <script>
@@ -574,8 +578,7 @@
         });
         DOM.vol.addEventListener('input', () => { if (tg && tg.HapticFeedback && Math.random() > 0.4) { tg.HapticFeedback.impactOccurred('medium'); } });
 
-        // --- 🖨️ محرك تحويل الصورة إلى PDF والطباعة المباشرة ---
-// --- 🖨️ محرك تحويل الصورة إلى PDF والطباعة المباشرة ---
+        // --- 🖨️ محرك تحويل الصورة إلى PDF والصور والطباعة ---
         (function initPrintModule() {
             const printModal = document.getElementById('printModal');
             document.getElementById('openPrintBtn').addEventListener('click', () => printModal.classList.add('open'));
@@ -600,7 +603,9 @@
                     currentStickerImg = imgSrc;
                     printPlaceholder.style.display = 'none';
                     stickerPaper.style.opacity = '1';
-                    stickerPaper.innerHTML = `<img id="previewImageToPrint" src="${imgSrc}" crossorigin="anonymous" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+                    
+                    // استخدام object-fit: cover لتمتد الصورة بشكل كامل وتقضي على الإطار الأبيض
+                    stickerPaper.innerHTML = `<img src="${imgSrc}" crossorigin="anonymous">`;
                 };
                 testImg.onerror = () => { alert("⚠️ Failed to load the image."); clearStickerPaper(); };
                 testImg.src = imgSrc;
@@ -628,62 +633,49 @@
                     ecoBtn.innerHTML = "🎨 Color Mode";
                 } else {
                     stickerPaper.classList.remove('eco-mode');
-                    ecoBtn.innerHTML = "🌿 Eco Mode (B&W)";
+                    ecoBtn.innerHTML = "🌿 Black & White (Eco)";
                 }
             };
 
-            // دالة للحصول على الصورة مع الفلاتر إذا كانت مفعلة
-            function getProcessedCanvas() {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.crossOrigin = "anonymous";
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        const ctx = canvas.getContext('2d');
-                        if (isStickerEcoMode) {
-                            ctx.filter = 'grayscale(100%) contrast(150%) brightness(110%)';
-                        }
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas);
-                    };
-                    img.src = currentStickerImg;
-                });
-            }
-
+            // دالة تنزيل الصورة
             window.downloadStickerImage = async function() {
                 if (!currentStickerImg) return alert("Please add an image first.");
                 const btn = document.getElementById('dlImgBtn');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '⏳...';
                 try {
-                    const canvas = await getProcessedCanvas();
+                    const canvas = await html2canvas(stickerPaper, {
+                        scale: 3, useCORS: true,
+                        onclone: (doc) => doc.getElementById('stickerPaper').style.transform = 'none'
+                    });
                     const link = document.createElement('a');
-                    link.download = 'Processed_Image.png';
+                    link.download = 'Document_Image.png';
                     link.href = canvas.toDataURL('image/png', 1.0);
                     link.click();
                 } catch (err) { alert("Error generating image."); }
+                // إعادة الزر لشكله الطبيعي (لحل مشكلة اختفاء الصورة أو توقف النظام)
                 btn.innerHTML = originalText;
             };
 
+            // دالة تنزيل الـ PDF
             window.downloadStickerPDF = async function() {
                 if (!currentStickerImg) return alert("Please add an image first.");
                 const btn = document.getElementById('dlPdfBtn');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '⏳...';
                 try {
-                    const canvas = await getProcessedCanvas();
+                    const canvas = await html2canvas(stickerPaper, {
+                        scale: 3, useCORS: true,
+                        onclone: (doc) => doc.getElementById('stickerPaper').style.transform = 'none'
+                    });
                     const imgData = canvas.toDataURL('image/jpeg', 1.0);
                     const { jsPDF } = window.jspdf;
-                    
-                    // إنشاء PDF بحجم الصورة بالضبط لمنع أي حواف بيضاء!
-                    const orientation = canvas.width > canvas.height ? 'l' : 'p';
-                    const pdf = new jsPDF({ orientation: orientation, unit: 'px', format: [canvas.width, canvas.height] });
-                    
-                    pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    // تم وضع الأبعاد لتمتد من حافة لحافة دون هوامش (0,0)
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
                     pdf.save("Document.pdf");
                 } catch (err) { alert("Error generating PDF."); }
+                // إعادة الزر لشكله الطبيعي
                 btn.innerHTML = originalText;
             };
         })();
