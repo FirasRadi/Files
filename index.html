@@ -1,360 +1,765 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pro Print Studio</title>
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 
-    <style>
-        /* --- Premium Theme Colors --- */
-        :root {
-            --bg-main: #09090b;
-            --bg-dock: #18181b;
-            --btn-bg: #27272a;
-            --btn-active: #3f3f46;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #3b82f6;
-        }
+<title>Print Studio</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+<style>
 
-        /* --- App Header --- */
-        .header {
-            padding: 20px; text-align: center; font-size: 24px; font-weight: 800;
-            background: linear-gradient(90deg, #60a5fa, #a855f7);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            flex-shrink: 0;
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+-webkit-tap-highlight-color:transparent;
+}
 
-        /* --- Stage Area (Preview) --- */
-        .stage {
-            flex: 1; width: 100%; display: flex; align-items: center;
-            overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory;
-            padding: 0 30px; gap: 20px;
-        }
-        .stage::-webkit-scrollbar { display: none; }
+html,body{
+width:100%;
+height:100%;
+background:#0b0b0d;
+color:white;
+overflow:hidden;
+}
 
-        .empty-state {
-            width: 100%; text-align: center; color: var(--text-muted); font-size: 16px; font-weight: bold;
-        }
+body{
+display:flex;
+flex-direction:column;
+}
 
-        .page-card {
-            width: 65vw; max-width: 260px; aspect-ratio: 1 / 1.414; 
-            background: #111; border-radius: 12px; border: 1px solid #333;
-            flex-shrink: 0; scroll-snap-align: center; position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden;
-        }
-        .page-card img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .delete-btn {
-            position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9);
-            color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
+header{
 
-        /* --- Action Dock --- */
-        .dock {
-            background: var(--bg-dock); padding: 25px 20px calc(25px + env(safe-area-inset-bottom));
-            border-top-left-radius: 30px; border-top-right-radius: 30px;
-            border-top: 1px solid #333; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); flex-shrink: 0;
-        }
+height:78px;
+display:flex;
+justify-content:center;
+align-items:flex-end;
+padding-bottom:12px;
+font-size:19px;
+font-weight:bold;
+color:#8e84ff;
 
-        .grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+}
 
-        .action-btn {
-            aspect-ratio: 1 / 0.95; background: var(--btn-bg); border: 1px solid #333;
-            border-radius: 18px; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 10px; color: var(--text-main); font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: 0.1s ease-in-out; position: relative;
-        }
-        .action-btn i { font-size: 26px; }
-        .action-btn:active { transform: scale(0.92); background: var(--btn-active); }
-        
-        .btn-link i { color: #0ea5e9; }
-        .btn-gallery i { color: #3b82f6; }
-        .btn-bw i { color: #f8fafc; }
-        .btn-img i { color: #a855f7; }
-        .btn-pdf i { color: #ef4444; }
-        .btn-print i { color: #10b981; }
-        
-        .action-btn.bw-active { background: #f8fafc; color: #000; }
-        .action-btn.bw-active i { color: #000; }
+#viewer{
 
-        /* --- URL Modal --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-            z-index: 100; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .modal-box {
-            background: var(--bg-dock); width: 100%; max-width: 350px;
-            border-radius: 24px; border: 1px solid #333; padding: 25px;
-            display: flex; flex-direction: column; gap: 15px; text-align: center;
-            transform: translateY(20px); transition: 0.3s ease;
-        }
-        .modal-overlay.active .modal-box { transform: translateY(0); }
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:15px;
+position:relative;
+overflow:auto;
 
-        .modal-input {
-            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444;
-            background: #000; color: #fff; outline: none; font-size: 15px; text-align: center;
-        }
-        
-        .modal-btn {
-            padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold;
-            background: var(--accent); color: #fff; cursor: pointer; width: 100%;
-        }
-        .modal-btn.close { background: #333; margin-top: -5px; }
+}
 
-        /* --- Print Zone Settings --- */
-        #printZone { display: none; }
-        @media print {
-            body { background: white !important; margin: 0 !important; padding: 0 !important; display: block !important; }
-            .header, .stage, .dock, .modal-overlay { display: none !important; }
-            #printZone { display: block !important; width: 100%; }
-            #printZone img { width: 210mm; height: 297mm; object-fit: cover; page-break-after: always; display: block; margin: 0; padding: 0; border: none; }
-            @page { size: A4 portrait; margin: 0; }
-        }
-    </style>
+#placeholder{
+
+text-align:center;
+opacity:.75;
+
+}
+
+#placeholder h2{
+
+font-size:30px;
+margin-bottom:12px;
+
+}
+
+#placeholder p{
+
+font-size:16px;
+color:#8b8b8b;
+
+}
+
+#canvas{
+
+display:none;
+max-width:100%;
+max-height:100%;
+border-radius:10px;
+background:white;
+
+}
+
+footer{
+
+background:#17171a;
+border-top-left-radius:30px;
+border-top-right-radius:30px;
+padding:18px;
+
+}
+
+.grid{
+
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:16px;
+
+}
+
+.btn{
+
+background:#242427;
+border-radius:22px;
+height:118px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+color:white;
+font-size:19px;
+cursor:pointer;
+user-select:none;
+transition:.2s;
+
+}
+
+.btn:active{
+
+transform:scale(.96);
+
+}
+
+.icon{
+
+font-size:34px;
+margin-bottom:12px;
+
+}
+
+.blue{
+
+color:#2aa8ff;
+
+}
+
+.purple{
+
+color:#9a63ff;
+
+}
+
+.red{
+
+color:#ff5555;
+
+}
+
+.green{
+
+color:#22d37c;
+
+}
+
+.gray{
+
+color:#f0f0f0;
+
+}
+
+input[type=file]{
+
+display:none;
+
+}
+
+/* Gallery Modal styles */
+#galleryModal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+z-index:1000;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.modal-content{
+background:#1c1c1e;
+border-radius:20px;
+width:100%;
+max-width:400px;
+padding:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.5);
+}
+
+.modal-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-bottom:20px;
+}
+
+.template-btn{
+background:#242427;
+border:1px solid #333;
+color:white;
+padding:15px 10px;
+border-radius:14px;
+cursor:pointer;
+font-size:14px;
+font-weight:bold;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:8px;
+transition:transform 0.15s, background-color 0.15s;
+}
+
+.template-btn:active{
+transform:scale(0.95);
+background:#333336;
+}
+
+/* Print CSS Stylesheet */
+@media print {
+body{
+background:white !important;
+color:black !important;
+}
+header, footer, #placeholder, #galleryModal {
+display:none !important;
+}
+#viewer{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+padding:0;
+margin:0;
+background:white !important;
+display:flex !important;
+justify-content:center;
+align-items:center;
+}
+#canvas{
+display:block !important;
+max-width:100% !important;
+max-height:100% !important;
+box-shadow:none !important;
+border-radius:0 !important;
+page-break-inside:avoid;
+}
+}
+
+</style>
+
 </head>
+
 <body>
 
-    <div class="header">Print Studio</div>
+<header>
 
-    <div class="stage" id="stageArea">
-        <div class="empty-state">No pages yet.<br><span style="font-size:13px; opacity:0.5; font-weight:normal;">Add links or photos from the menu below.</span></div>
-    </div>
+<h1>Print Studio</h1>
 
-    <div class="dock">
-        <div class="grid-6">
-            <div class="action-btn btn-link" onclick="openLinkModal()">
-                <i class="fas fa-link"></i><span>URL Link</span>
-            </div>
-            
-            <label class="action-btn btn-gallery">
-                <i class="fas fa-images"></i><span>Gallery</span>
-                <input type="file" accept="image/*" multiple onchange="handleGallery(event)" style="display:none;">
-            </label>
-            
-            <div class="action-btn btn-bw" id="bwBtn" onclick="toggleBW()">
-                <i class="fas fa-adjust"></i><span>B&W</span>
-            </div>
-            
-            <div class="action-btn btn-img" onclick="downloadImageSync()" id="btnImg">
-                <i class="fas fa-image"></i><span>Image</span>
-            </div>
-            
-            <div class="action-btn btn-pdf" onclick="downloadPdfSync()" id="btnPdf">
-                <i class="fas fa-file-pdf"></i><span>PDF</span>
-            </div>
-            
-            <div class="action-btn btn-print" onclick="executePrintSync()" id="btnPrint">
-                <i class="fas fa-print"></i><span>Print</span>
-            </div>
-        </div>
-    </div>
+</header>
 
-    <div class="modal-overlay" id="linkModal">
-        <div class="modal-box">
-            <h3 style="color:#fff;">Add Image URL</h3>
-            <input type="text" id="urlInput" class="modal-input" placeholder="https://...">
-            <button class="modal-btn" onclick="submitUrl()">Add Page</button>
-            <button class="modal-btn close" onclick="closeLinkModal()">Cancel</button>
-        </div>
-    </div>
+<div id="viewer">
 
-    <div id="printZone"></div>
+<div id="placeholder">
 
-    <script>
-        // Init Telegram WebApp
-        const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if (tg) { tg.ready(); tg.expand(); }
+<h2>No pages yet.</h2>
 
-        // Trigger Haptic Feedback
-        function triggerHaptic(type = 'light') {
-            if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
+<p>Add links or photos from the menu below.</p>
+
+</div>
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+<footer>
+
+<div class="grid">
+
+<div class="btn" id="urlBtn">
+
+<div class="icon blue">🔗</div>
+
+<div>URL Link</div>
+
+</div>
+
+<div class="btn" id="galleryBtn">
+
+<div class="icon blue">🖼️</div>
+
+<div>Gallery</div>
+
+</div>
+
+<div class="btn" id="bwBtn">
+
+<div class="icon gray">◐</div>
+
+<div>B&W</div>
+
+</div>
+
+<div class="btn" id="imageBtn">
+
+<div class="icon purple">🖼️</div>
+
+<div>Image</div>
+
+</div>
+
+<div class="btn" id="pdfBtn">
+
+<div class="icon red">📄</div>
+
+<div>PDF</div>
+
+</div>
+
+<div class="btn" id="printBtn">
+
+<div class="icon green">🖨️</div>
+
+<div>Print</div>
+
+</div>
+
+</div>
+
+</footer>
+
+<input type="file" id="picker" accept="image/*">
+
+<!-- Modal container for printable templates -->
+<div id="galleryModal">
+<div class="modal-content">
+<h3 style="margin-top:0; margin-bottom:15px; color:#8e84ff; text-align:center;">Print Templates</h3>
+<div class="modal-grid">
+<button class="template-btn" onclick="generateTemplate('lined')">📝 Lined Paper</button>
+<button class="template-btn" onclick="generateTemplate('graph')">🔲 Graph Paper</button>
+<button class="template-btn" onclick="generateTemplate('dotgrid')">💬 Dot Grid</button>
+<button class="template-btn" onclick="generateTemplate('todo')">✅ To-Do List</button>
+<button class="template-btn" onclick="generateTemplate('weekly')">📅 Weekly Plan</button>
+<button class="template-btn" onclick="generateTemplate('mandala')">🌀 Coloring</button>
+</div>
+<button onclick="closeGalleryModal()" style="width:100%; background:#242427; border:none; color:white; padding:12px; border-radius:12px; font-weight:bold; cursor:pointer;">Close</button>
+</div>
+</div>
+
+<script>
+
+Telegram.WebApp.ready();
+Telegram.WebApp.expand();
+
+const picker=document.getElementById("picker");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const placeholder=document.getElementById("placeholder");
+
+let originalImage=null;
+let currentImage=null;
+
+// Offscreen canvas structure to preserve the original drawing details before filtering
+const offscreenCanvas = document.createElement("canvas");
+const offCtx = offscreenCanvas.getContext("2d");
+let filterMode = 'original'; // Cycles: original -> grayscale -> threshold -> dithered
+
+// Helper to update the canvas bounding dimensions and structure
+function resetCanvas(width = 1200, height = 1600) {
+  canvas.width = width;
+  canvas.height = height;
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, width, height);
+  placeholder.style.display = 'none';
+  canvas.style.display = 'block';
+}
+
+// Stores the clean initial state of loaded files/templates
+function saveState() {
+  offscreenCanvas.width = canvas.width;
+  offscreenCanvas.height = canvas.height;
+  offCtx.drawImage(canvas, 0, 0);
+  filterMode = 'original';
+  updateBwBtnLabel();
+}
+
+// --- Menu Options and Event Handlers ---
+
+// 1. URL Image Loader
+document.getElementById("urlBtn").onclick = () => {
+  const url = prompt("Enter Image URL (must support CORS):");
+  if (url) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      let w = img.width;
+      let h = img.height;
+      const maxDim = 2048;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
         }
+      }
+      resetCanvas(w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      saveState();
+    };
+    img.onerror = () => {
+      alert("Failed to load. Ensure the link points to a valid file with CORS allowance.");
+    };
+    img.src = url;
+  }
+};
 
-        let rawImages = [];
-        let processedImages = [];
-        let isBw = false;
+// 2. Gallery Modal
+const galleryModal = document.getElementById("galleryModal");
+document.getElementById("galleryBtn").onclick = () => {
+  galleryModal.style.display = "flex";
+};
 
-        const stageArea = document.getElementById('stageArea');
-        const bwBtn = document.getElementById('bwBtn');
-        const linkModal = document.getElementById('linkModal');
-        const urlInput = document.getElementById('urlInput');
-        const printZone = document.getElementById('printZone');
+galleryModal.onclick = (e) => {
+  if (e.target === galleryModal) {
+    closeGalleryModal();
+  }
+};
 
-        // Render UI
-        function renderStageUI() {
-            stageArea.innerHTML = '';
-            if(processedImages.length === 0) {
-                stageArea.innerHTML = '<div class="empty-state">No pages yet.<br><span style="font-size:13px; opacity:0.5; font-weight:normal;">Add links or photos from the menu below.</span></div>';
-                return;
-            }
-            processedImages.forEach((b64, idx) => {
-                const card = document.createElement('div');
-                card.className = 'page-card';
-                card.innerHTML = `<img src="${b64}"><button class="delete-btn" onclick="removePage(${idx})"><i class="fas fa-times"></i></button>`;
-                stageArea.appendChild(card);
-            });
+function closeGalleryModal() {
+  galleryModal.style.display = "none";
+}
+
+function generateTemplate(type) {
+  closeGalleryModal();
+  if (Telegram.WebApp.HapticFeedback) {
+    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+  }
+  
+  if (type === 'lined') {
+    resetCanvas(1200, 1600);
+    ctx.strokeStyle = "#ffadad";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(120, 0);
+    ctx.lineTo(120, 1600);
+    ctx.stroke();
+    
+    ctx.strokeStyle = "#a2d2ff";
+    ctx.lineWidth = 1;
+    for (let y = 150; y < 1600; y += 45) {
+      ctx.beginPath();
+      ctx.moveTo(120, y);
+      ctx.lineTo(1200, y);
+      ctx.stroke();
+    }
+  } else if (type === 'graph') {
+    resetCanvas(1200, 1600);
+    ctx.strokeStyle = "#e0e0e0";
+    ctx.lineWidth = 1;
+    for (let x = 40; x < 1200; x += 40) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 1600);
+      ctx.stroke();
+    }
+    for (let y = 40; y < 1600; y += 40) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(1200, y);
+      ctx.stroke();
+    }
+  } else if (type === 'dotgrid') {
+    resetCanvas(1200, 1600);
+    ctx.fillStyle = "#888888";
+    for (let x = 50; x < 1200; x += 50) {
+      for (let y = 50; y < 1600; y += 50) {
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (type === 'todo') {
+    resetCanvas(1200, 1600);
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 60px Arial";
+    ctx.fillText("TO-DO LIST", 100, 150);
+    ctx.strokeStyle = "#22d37c";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(100, 180);
+    ctx.lineTo(1100, 180);
+    ctx.stroke();
+    
+    ctx.strokeStyle = "#444444";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 15; i++) {
+      const y = 280 + i * 75;
+      ctx.strokeRect(100, y - 40, 40, 40);
+      ctx.beginPath();
+      ctx.moveTo(170, y);
+      ctx.lineTo(1100, y);
+      ctx.stroke();
+    }
+  } else if (type === 'weekly') {
+    resetCanvas(1200, 1600);
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 55px Arial";
+    ctx.fillText("WEEKLY PLANNER", 100, 120);
+    ctx.strokeStyle = "#9a63ff";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(100, 145);
+    ctx.lineTo(1100, 145);
+    ctx.stroke();
+    
+    const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+    ctx.strokeStyle = "#2c2c2e";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 7; i++) {
+      const x = i % 2 === 0 ? 100 : 625;
+      const y = 200 + Math.floor(i / 2) * 320;
+      ctx.strokeRect(x, y, 475, 270);
+      ctx.fillStyle = "#f4f4f4";
+      ctx.fillRect(x + 2, y + 2, 471, 45);
+      ctx.fillStyle = "#000000";
+      ctx.font = "bold 20px Arial";
+      ctx.fillText(days[i], x + 15, y + 32);
+    }
+    const nx = 625, ny = 200 + 3 * 320;
+    ctx.strokeRect(nx, ny, 475, 270);
+    ctx.fillStyle = "#f4f4f4";
+    ctx.fillRect(nx + 2, ny + 2, 471, 45);
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 20px Arial";
+    ctx.fillText("NOTES", nx + 15, ny + 32);
+  } else if (type === 'mandala') {
+    resetCanvas(1200, 1600);
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2.5;
+    for (let ring = 1; ring <= 6; ring++) {
+      const radius = ring * 110;
+      const petNum = 12 * ring;
+      for (let p = 0; p < petNum; p++) {
+        const angle = (p / petNum) * Math.PI * 2;
+        const x = 600 + Math.cos(angle) * (radius - 50);
+        const y = 800 + Math.sin(angle) * (radius - 50);
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.45, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    ctx.beginPath();
+    ctx.arc(600, 800, 680, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  saveState();
+}
+
+// 3. Black and White Processing Filters (Grayscale, Binary Threshold, Floyd-Steinberg Dithering)
+const bwBtn = document.getElementById("bwBtn");
+bwBtn.onclick = () => {
+  if (!offscreenCanvas.width) {
+    alert("Please load an image or page first.");
+    return;
+  }
+  
+  if (filterMode === 'original') filterMode = 'grayscale';
+  else if (filterMode === 'grayscale') filterMode = 'threshold';
+  else if (filterMode === 'threshold') filterMode = 'dithered';
+  else filterMode = 'original';
+  
+  if (Telegram.WebApp.HapticFeedback) {
+    Telegram.WebApp.HapticFeedback.impactOccurred('light');
+  }
+  
+  updateBwBtnLabel();
+  applyFilters();
+};
+
+function updateBwBtnLabel() {
+  const label = document.querySelector("#bwBtn div:last-child");
+  if (filterMode === 'original') label.innerText = 'B&W';
+  else if (filterMode === 'grayscale') label.innerText = 'Grayscale';
+  else if (filterMode === 'threshold') label.innerText = 'Binary';
+  else if (filterMode === 'dithered') label.innerText = 'Dithered';
+}
+
+function applyFilters() {
+  ctx.drawImage(offscreenCanvas, 0, 0);
+  if (filterMode === 'original') return;
+  
+  try {
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d = imgData.data;
+    
+    if (filterMode === 'grayscale') {
+      for (let i = 0; i < d.length; i += 4) {
+        const gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+        d[i] = d[i+1] = d[i+2] = gray;
+      }
+    } else if (filterMode === 'threshold') {
+      for (let i = 0; i < d.length; i += 4) {
+        const gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+        const val = gray >= 128 ? 255 : 0;
+        d[i] = d[i+1] = d[i+2] = val;
+      }
+    } else if (filterMode === 'dithered') {
+      const w = canvas.width;
+      const h = canvas.height;
+      const lum = new Float32Array(w * h);
+      for (let i = 0; i < d.length; i += 4) {
+        lum[i/4] = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+      }
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = y * w + x;
+          const oldVal = lum[idx];
+          const newVal = oldVal < 128 ? 0 : 255;
+          lum[idx] = newVal;
+          const err = oldVal - newVal;
+          
+          if (x + 1 < w) lum[idx + 1] += err * 7 / 16;
+          if (y + 1 < h) {
+            if (x - 1 >= 0) lum[idx + w - 1] += err * 3 / 16;
+            lum[idx + w] += err * 5 / 16;
+            if (x + 1 < w) lum[idx + w + 1] += err * 1 / 16;
+          }
         }
+      }
+      for (let i = 0; i < d.length; i += 4) {
+        const val = Math.min(255, Math.max(0, lum[i/4]));
+        d[i] = d[i+1] = d[i+2] = val;
+      }
+    }
+    
+    ctx.putImageData(imgData, 0, 0);
+  } catch (e) {
+    alert("Unable to process: Image resource has CORS restrictions. Upload local files via the Image button instead.");
+    filterMode = 'original';
+    updateBwBtnLabel();
+    ctx.drawImage(offscreenCanvas, 0, 0);
+  }
+}
 
-        // Engine: Pre-process images instantly on add to ensure sync buttons work
-        async function rebuildEngine() {
-            stageArea.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Processing...</div>';
-            processedImages = [];
-            for (let src of rawImages) {
-                const b64 = await createA4Canvas(src);
-                if(b64) processedImages.push(b64);
-            }
-            renderStageUI();
+// 4. Local File Image Selector
+document.getElementById("imageBtn").onclick = () => {
+  picker.click();
+};
+
+picker.onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width;
+      let h = img.height;
+      const maxDim = 2048;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
         }
+      }
+      resetCanvas(w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      saveState();
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+};
 
-        function createA4Canvas(src) {
-            return new Promise((resolve) => {
-                const img = new Image(); 
-                img.crossOrigin = "anonymous";
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 1404; canvas.height = 1986; 
-                    const ctx = canvas.getContext('2d');
-                    
-                    if (isBw) ctx.filter = 'grayscale(100%) contrast(150%)';
-                    ctx.fillStyle = '#000'; 
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+// 5. PDF Handler
+document.getElementById("pdfBtn").onclick = () => {
+  const pdfPicker = document.createElement("input");
+  pdfPicker.type = "file";
+  pdfPicker.accept = "application/pdf";
+  pdfPicker.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      loadPdf(file);
+    }
+  };
+  pdfPicker.click();
+};
 
-                    const ratio = Math.max(canvas.width / img.width, canvas.height / img.height); 
-                    const cx = (canvas.width - img.width * ratio) / 2;
-                    const cy = (canvas.height - img.height * ratio) / 2;
+function loadPdf(file) {
+  if (typeof pdfjsLib === "undefined") {
+    const originalText = placeholder.innerHTML;
+    placeholder.innerHTML = "<h2>Loading PDF engine...</h2><p>Please wait a moment.</p>";
+    
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js";
+    script.onload = () => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+      renderPdfPage(file);
+    };
+    script.onerror = () => {
+      placeholder.innerHTML = originalText;
+      alert("Failed to load PDF library.");
+    };
+    document.head.appendChild(script);
+  } else {
+    renderPdfPage(file);
+  }
+}
 
-                    ctx.drawImage(img, 0, 0, img.width, img.height, cx, cy, img.width*ratio, img.height*ratio);
-                    resolve(canvas.toDataURL('image/jpeg', 0.95)); 
-                };
-                img.onerror = () => { resolve(null); };
-                img.src = src;
-            });
-        }
-
-        window.removePage = async function(idx) { 
-            rawImages.splice(idx, 1); 
-            triggerHaptic('medium');
-            await rebuildEngine();
-        };
-
-        window.openLinkModal = () => { urlInput.value = ''; linkModal.classList.add('active'); triggerHaptic(); };
-        window.closeLinkModal = () => { linkModal.classList.remove('active'); };
+function renderPdfPage(file) {
+  const fileReader = new FileReader();
+  fileReader.onload = function() {
+    const typedarray = new Uint8Array(this.result);
+    pdfjsLib.getDocument(typedarray).promise.then((pdf) => {
+      pdf.getPage(1).then((page) => {
+        const viewport = page.getViewport({ scale: 2.0 });
+        resetCanvas(viewport.width, viewport.height);
         
-        window.submitUrl = async () => { 
-            if(urlInput.value) { 
-                rawImages.push(urlInput.value); 
-                closeLinkModal();
-                triggerHaptic('success');
-                await rebuildEngine();
-            } 
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
         };
+        page.render(renderContext).promise.then(() => {
+          saveState();
+        });
+      });
+    }).catch(err => {
+      alert("Failed to read PDF file: " + err.message);
+    });
+  };
+  fileReader.readAsArrayBuffer(file);
+}
 
-        window.handleGallery = async function(e) {
-            const files = e.target.files;
-            if(!files.length) return;
-            
-            triggerHaptic('light');
-            stageArea.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Reading files...</div>';
-            
-            for(let f of files) {
-                const b64 = await new Promise(res => {
-                    const reader = new FileReader();
-                    reader.onload = ev => res(ev.target.result);
-                    reader.readAsDataURL(f);
-                });
-                rawImages.push(b64);
-            }
-            e.target.value = '';
-            await rebuildEngine();
-        };
+// 6. Native Browser Print Trigger
+document.getElementById("printBtn").onclick = () => {
+  if (!offscreenCanvas.width) {
+    alert("Please load an image or page to print.");
+    return;
+  }
+  
+  if (Telegram.WebApp.HapticFeedback) {
+    Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+  }
+  
+  window.print();
+};
 
-        window.toggleBW = async function() {
-            if(rawImages.length === 0) return;
-            isBw = !isBw;
-            bwBtn.classList.toggle('bw-active', isBw);
-            triggerHaptic('medium');
-            await rebuildEngine();
-        };
+</script>
 
-        // ==========================================
-        // 📥 1. Synchronous Image Download
-        // ==========================================
-        window.downloadImageSync = function() {
-            if(processedImages.length === 0) return alert("Please add an image first.");
-            triggerHaptic('heavy');
-            
-            // Sync execution prevents browser blocking
-            processedImages.forEach((b64, i) => {
-                const link = document.createElement('a');
-                link.href = b64;
-                link.download = `Page_${i+1}.jpg`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-        };
-
-        // ==========================================
-        // 📄 2. Synchronous PDF Download
-        // ==========================================
-        window.downloadPdfSync = function() {
-            if(processedImages.length === 0) return alert("Please add an image first.");
-            triggerHaptic('heavy');
-            
-            try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const w = pdf.internal.pageSize.getWidth(); 
-                const h = pdf.internal.pageSize.getHeight();
-
-                processedImages.forEach((b64, i) => {
-                    if(i > 0) pdf.addPage();
-                    pdf.addImage(b64, 'JPEG', 0, 0, w, h); 
-                });
-                
-                pdf.save("Document.pdf"); 
-                
-            } catch(e) { 
-                alert("Error generating PDF."); 
-            }
-        };
-
-        // ==========================================
-        // 🖨️ 3. Synchronous Direct Print
-        // ==========================================
-        window.executePrintSync = function() {
-            if(processedImages.length === 0) return alert("Please add an image first.");
-            triggerHaptic('heavy');
-            
-            // Synchronous DOM update ensures window.print is trusted
-            printZone.innerHTML = processedImages.map(b64 => `<img src="${b64}">`).join('');
-            
-            window.print();
-            
-            // Clean up silently
-            setTimeout(() => { printZone.innerHTML = ''; }, 1000);
-        };
-    </script>
 </body>
 </html>
