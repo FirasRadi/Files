@@ -1,630 +1,370 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pro Print Studio</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<title>Print Studio</title>
+    <style>
+        /* --- الألوان الفاخرة --- */
+        :root {
+            --bg-main: #09090b;
+            --bg-dock: #18181b;
+            --btn-bg: #27272a;
+            --btn-active: #3f3f46;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+        }
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
 
-<style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    font-family:Arial,sans-serif;
-    -webkit-tap-highlight-color:transparent;
-}
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-body{
-    background:#09090b;
-    color:white;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-}
+        /* --- الهيدر --- */
+        .header {
+            padding: 20px; text-align: center; font-size: 24px; font-weight: 800;
+            background: linear-gradient(90deg, #60a5fa, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            flex-shrink: 0;
+        }
 
-.header{
-    text-align:center;
-    padding:18px;
-    font-size:24px;
-    font-weight:bold;
-}
+        /* --- المسرح (عرض الصور) --- */
+        .stage {
+            flex: 1; width: 100%; display: flex; align-items: center;
+            overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory;
+            padding: 0 30px; gap: 20px;
+        }
+        .stage::-webkit-scrollbar { display: none; }
 
-.stage{
-    flex:1;
-    display:flex;
-    gap:15px;
-    overflow-x:auto;
-    padding:20px;
-    align-items:center;
-}
+        .empty-state {
+            width: 100%; text-align: center; color: var(--text-muted); font-size: 16px; font-weight: bold;
+        }
 
-.stage::-webkit-scrollbar{
-    display:none;
-}
+        .page-card {
+            width: 65vw; max-width: 260px; aspect-ratio: 1 / 1.414; /* نسبة A4 */
+            background: #111; border-radius: 12px; border: 1px solid #333;
+            flex-shrink: 0; scroll-snap-align: center; position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .page-card img { width: 100%; height: 100%; object-fit: cover; }
+        .page-card.bw-on img { filter: grayscale(100%) contrast(150%); }
+        
+        .delete-btn {
+            position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9);
+            color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+        }
 
-.empty{
-    width:100%;
-    text-align:center;
-    color:#aaa;
-}
+        /* --- اللوحة السفلية --- */
+        .dock {
+            background: var(--bg-dock); padding: 25px 20px calc(25px + env(safe-area-inset-bottom));
+            border-top-left-radius: 30px; border-top-right-radius: 30px;
+            border-top: 1px solid #333; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); flex-shrink: 0;
+        }
 
-.card{
-    width:260px;
-    aspect-ratio:210/297;
-    background:#111;
-    border-radius:12px;
-    overflow:hidden;
-    flex-shrink:0;
-    position:relative;
-}
+        .grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
-.card img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
+        .action-btn {
+            aspect-ratio: 1 / 0.95; background: var(--btn-bg); border: 1px solid #333;
+            border-radius: 18px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 10px; color: var(--text-main); font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: 0.15s; position: relative;
+        }
+        .action-btn i { font-size: 26px; }
+        .action-btn:active { transform: scale(0.92); background: var(--btn-active); }
+        
+        .btn-link i { color: #0ea5e9; }
+        .btn-gallery i { color: #3b82f6; }
+        .btn-bw i { color: #f8fafc; }
+        .btn-img i { color: #a855f7; }
+        .btn-pdf i { color: #ef4444; }
+        .btn-print i { color: #10b981; }
+        
+        .action-btn.bw-active { background: #f8fafc; color: #000; }
+        .action-btn.bw-active i { color: #000; }
 
-.bw img{
-    filter:grayscale(1) contrast(1.5);
-}
+        /* --- نافذة الرابط المنبثقة --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            z-index: 100; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-box {
+            background: var(--bg-dock); width: 100%; max-width: 350px;
+            border-radius: 24px; border: 1px solid #333; padding: 25px;
+            display: flex; flex-direction: column; gap: 15px; text-align: center;
+            transform: translateY(20px); transition: 0.3s ease;
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
 
-.delete{
-    position:absolute;
-    top:8px;
-    right:8px;
-    border:0;
-    border-radius:50%;
-    width:30px;
-    height:30px;
-    background:#e11;
-    color:white;
-}
+        .modal-input {
+            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444;
+            background: #000; color: #fff; outline: none; font-size: 15px;
+        }
+        
+        .modal-btn {
+            padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold;
+            background: var(--accent); color: #fff; cursor: pointer; width: 100%;
+        }
+        .modal-btn.close { background: #333; margin-top: -5px; }
 
-
-.dock{
-    background:#18181b;
-    padding:15px;
-    border-radius:25px 25px 0 0;
-}
-
-.buttons{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-}
-
-button,
-label{
-    background:#27272a;
-    color:white;
-    border:1px solid #444;
-    border-radius:15px;
-    height:75px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    gap:5px;
-    cursor:pointer;
-}
-
-button:active,
-label:active{
-    transform:scale(.94);
-}
-
-
-.modal{
-    position:fixed;
-    inset:0;
-    background:#000b;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-.modal.show{
-    display:flex;
-}
-
-.box{
-    background:#18181b;
-    padding:20px;
-    border-radius:20px;
-    width:100%;
-    max-width:350px;
-}
-
-input{
-    width:100%;
-    padding:12px;
-    margin:15px 0;
-    background:#000;
-    color:white;
-    border:1px solid #555;
-    border-radius:10px;
-}
-
-.box button{
-    height:50px;
-    width:100%;
-    margin-top:8px;
-}
-
-
-#printZone{
-    display:none;
-}
-
-@media print{
-
-body{
-    display:block;
-}
-
-.header,
-.stage,
-.dock,
-.modal{
-    display:none!important;
-}
-
-#printZone{
-    display:block;
-}
-
-#printZone img{
-    width:210mm;
-    height:297mm;
-    object-fit:cover;
-    page-break-after:always;
-}
-
-@page{
-    size:A4;
-    margin:0;
-}
-
-}
-
-</style>
+        /* --- الطباعة --- */
+        #printZone { display: none; }
+        @media print {
+            body { background: white !important; margin: 0 !important; padding: 0 !important; display: block !important; }
+            .header, .stage, .dock, .modal-overlay { display: none !important; }
+            #printZone { display: block !important; width: 100%; }
+            #printZone img { width: 210mm; height: 297mm; object-fit: cover; page-break-after: always; display: block; margin: 0; }
+            @page { size: A4 portrait; margin: 0; }
+        }
+    </style>
 </head>
-
-
-
-
 <body>
 
-<div class="header">
-    Print Studio
-</div>
+    <div class="header">Print Studio</div>
 
-
-<div class="stage" id="stage">
-    <div class="empty" id="empty">
-        لا توجد صور بعد
+    <!-- مسرح عرض الصور -->
+    <div class="stage" id="stageArea">
+        <div class="empty-state" id="emptyState">No pages yet.<br><span style="font-size:13px; opacity:0.5; font-weight:normal;">Add links or photos from the menu below.</span></div>
     </div>
-</div>
 
+    <!-- لوحة الأزرار -->
+    <div class="dock">
+        <div class="grid-6">
+            <div class="action-btn btn-link" onclick="openLinkModal()">
+                <i class="fas fa-link"></i><span>URL Link</span>
+            </div>
+            
+            <label class="action-btn btn-gallery">
+                <i class="fas fa-images"></i><span>Gallery</span>
+                <input type="file" accept="image/*" multiple onchange="handleGallery(event)" style="display:none;">
+            </label>
+            
+            <div class="action-btn btn-bw" id="bwBtn" onclick="toggleBW()">
+                <i class="fas fa-adjust"></i><span>B&W</span>
+            </div>
+            
+            <!-- زر تنزيل الصور مباشرة (تم حل المشكلة) -->
+            <div class="action-btn btn-img" onclick="downloadImageDirect()" id="btnImg">
+                <i class="fas fa-image"></i><span>Image</span>
+            </div>
+            
+            <!-- زر تنزيل الـ PDF مباشرة -->
+            <div class="action-btn btn-pdf" onclick="downloadPdfDirect()" id="btnPdf">
+                <i class="fas fa-file-pdf"></i><span>PDF</span>
+            </div>
+            
+            <!-- زر الطباعة مباشرة -->
+            <div class="action-btn btn-print" onclick="executePrint()" id="btnPrint">
+                <i class="fas fa-print"></i><span>Print</span>
+            </div>
+        </div>
+    </div>
 
-<div class="dock">
+    <!-- نافذة إدخال الرابط -->
+    <div class="modal-overlay" id="linkModal">
+        <div class="modal-box">
+            <h3 style="color:#fff;">Add Image URL</h3>
+            <input type="text" id="urlInput" class="modal-input" placeholder="https://...">
+            <button class="modal-btn" onclick="submitUrl()">Add Page</button>
+            <button class="modal-btn close" onclick="closeLinkModal()">Cancel</button>
+        </div>
+    </div>
 
-<div class="buttons">
-
-<button onclick="openModal()">
-🔗
-<span>URL</span>
-</button>
-
-
-<label>
-🖼️
-<span>Gallery</span>
-
-<input id="gallery"
-type="file"
-accept="image/*"
-multiple
-hidden
-onchange="galleryAdd(event)">
-
-</label>
-
-
-<button onclick="toggleBW()">
-⚫
-<span>B&W</span>
-</button>
-
-
-<button onclick="downloadImages()">
-📷
-<span>Image</span>
-</button>
-
-
-<button onclick="downloadPDF()">
-📄
-<span>PDF</span>
-</button>
-
-
-<button onclick="printPages()">
-🖨️
-<span>Print</span>
-</button>
-
-
-</div>
-
-</div>
-
-
-
-<div class="modal" id="modal">
-
-<div class="box">
-
-<h3>
-إضافة رابط صورة
-</h3>
-
-
-<input id="url"
-placeholder="https://image.jpg">
-
-
-<button onclick="addURL()">
-إضافة
-</button>
-
-
-<button onclick="closeModal()">
-إلغاء
-</button>
-
-
-</div>
-
-</div>
-
-
-<div id="printZone"></div>
-
-
-
-
+    <!-- مساحة الطباعة -->
+    <div id="printZone"></div>
 
     <script>
-
-const tg = window.Telegram?.WebApp;
-if(tg){
-    tg.ready();
-    tg.expand();
-}
-
-
-let pages=[];
-let bw=false;
-
-
-const stage=document.getElementById("stage");
-const empty=document.getElementById("empty");
-
-
-
-function render(){
-
-    stage.innerHTML="";
-
-    if(pages.length===0){
-        stage.appendChild(empty);
-        return;
-    }
-
-
-    pages.forEach((src,i)=>{
-
-        let card=document.createElement("div");
-
-        card.className="card "+(bw?"bw":"");
-
-
-        card.innerHTML=`
-
-        <img src="${src}">
-
-        <button class="delete"
-        onclick="removePage(${i})">
-        ×
-        </button>
-
-        `;
-
-
-        stage.appendChild(card);
-
-    });
-
-}
-
-
-
-function removePage(i){
-
-    pages.splice(i,1);
-    render();
-
-}
-
-
-
-function addImage(src){
-
-    let img=new Image();
-
-    img.onload=()=>{
-
-        pages.push(src);
-        render();
-
-    };
-
-
-    img.onerror=()=>{
-
-        alert("تعذر تحميل الصورة");
-
-    };
-
-
-    img.src=src;
-
-}
-
-
-
-
-
-function galleryAdd(e){
-
-    [...e.target.files].forEach(file=>{
-
-        let r=new FileReader();
-
-        r.onload=x=>addImage(x.target.result);
-
-        r.readAsDataURL(file);
-
-    });
-
-
-    e.target.value="";
-
-}
-
-
-
-
-function openModal(){
-
-    document.getElementById("modal")
-    .classList.add("show");
-
-}
-
-
-function closeModal(){
-
-    document.getElementById("modal")
-    .classList.remove("show");
-
-}
-
-
-
-function addURL(){
-
-    let url=document.getElementById("url").value.trim();
-
-    if(url){
-
-        addImage(url);
-        closeModal();
-
-    }
-
-}
-
-
-
-
-function toggleBW(){
-
-    bw=!bw;
-    render();
-
-}
-
-
-
-
-function process(src){
-
-return new Promise(resolve=>{
-
-
-let img=new Image();
-
-img.onload=()=>{
-
-
-let c=document.createElement("canvas");
-
-c.width=1404;
-c.height=1986;
-
-
-let ctx=c.getContext("2d");
-
-
-if(bw)
-ctx.filter="grayscale(1) contrast(1.5)";
-
-
-let scale=Math.max(
-c.width/img.width,
-c.height/img.height
-);
-
-
-let x=(c.width-img.width*scale)/2;
-let y=(c.height-img.height*scale)/2;
-
-
-ctx.drawImage(
-img,
-x,
-y,
-img.width*scale,
-img.height*scale
-);
-
-
-
-resolve(c.toDataURL("image/jpeg",0.95));
-
-
-};
-
-
-img.src=src;
-
-
-});
-
-}
-
-
-
-
-async function downloadImages(){
-
-if(!pages.length)
-return alert("أضف صوراً أولاً");
-
-
-for(let i=0;i<pages.length;i++){
-
-let data=await process(pages[i]);
-
-
-let a=document.createElement("a");
-
-a.href=data;
-
-a.download="Page_"+(i+1)+".jpg";
-
-a.click();
-
-
-}
-
-}
-
-
-
-
-async function downloadPDF(){
-
-if(!pages.length)
-return alert("أضف صوراً أولاً");
-
-
-const {jsPDF}=window.jspdf;
-
-
-let pdf=new jsPDF(
-"p",
-"mm",
-"A4"
-);
-
-
-for(let i=0;i<pages.length;i++){
-
-
-if(i)
-pdf.addPage();
-
-
-let img=await process(pages[i]);
-
-
-pdf.addImage(
-img,
-"JPEG",
-0,
-0,
-210,
-297
-);
-
-
-}
-
-
-pdf.save("Document.pdf");
-
-
-}
-
-
-
-
-async function printPages(){
-
-if(!pages.length)
-return alert("أضف صوراً أولاً");
-
-
-let zone=document.getElementById("printZone");
-
-zone.innerHTML="";
-
-
-for(let p of pages){
-
-let img=document.createElement("img");
-
-img.src=await process(p);
-
-zone.appendChild(img);
-
-}
-
-
-
-setTimeout(()=>{
-
-window.print();
-
-zone.innerHTML="";
-
-},500);
-
-
-}
-
-
-
-</script>
-
+        const tg = window.Telegram ? window.Telegram.WebApp : null;
+        if (tg) { tg.ready(); tg.expand(); }
+
+        let pages = [];
+        let isBw = false;
+
+        const stageArea = document.getElementById('stageArea');
+        const emptyState = document.getElementById('emptyState');
+        const bwBtn = document.getElementById('bwBtn');
+        const linkModal = document.getElementById('linkModal');
+        const urlInput = document.getElementById('urlInput');
+
+        function renderStage() {
+            stageArea.innerHTML = '';
+            if(pages.length === 0) {
+                stageArea.appendChild(emptyState);
+                return;
+            }
+            pages.forEach((src, idx) => {
+                const card = document.createElement('div');
+                card.className = `page-card ${isBw ? 'bw-on' : ''}`;
+                card.innerHTML = `<img src="${src}"><button class="delete-btn" onclick="removePage(${idx})"><i class="fas fa-times"></i></button>`;
+                stageArea.appendChild(card);
+            });
+        }
+
+        window.removePage = function(idx) { pages.splice(idx, 1); renderStage(); };
+
+        function addPage(src) {
+            const img = new Image(); img.crossOrigin = "anonymous";
+            img.onload = () => { pages.push(src); renderStage(); };
+            img.onerror = () => alert("⚠️ Cannot load link due to server protection. Please save the image to your phone first.");
+            img.src = src;
+        }
+
+        window.openLinkModal = () => { urlInput.value = ''; linkModal.classList.add('active'); };
+        window.closeLinkModal = () => { linkModal.classList.remove('active'); };
+        window.submitUrl = () => { if(urlInput.value) { addPage(urlInput.value); closeLinkModal(); } };
+
+        window.handleGallery = function(e) {
+            const files = e.target.files;
+            if(!files.length) return;
+            Array.from(files).forEach(f => {
+                const reader = new FileReader();
+                reader.onload = ev => addPage(ev.target.result);
+                reader.readAsDataURL(f);
+            });
+            e.target.value = '';
+        };
+
+        window.toggleBW = function() {
+            isBw = !isBw;
+            bwBtn.classList.toggle('bw-active', isBw);
+            renderStage();
+        };
+
+        // معالجة A4 بدون أي أطراف بيضاء
+        function processPage(src) {
+            return new Promise((resolve) => {
+                const img = new Image(); img.crossOrigin = "anonymous";
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 1404; canvas.height = 1986; 
+                    const ctx = canvas.getContext('2d');
+                    
+                    if (isBw) ctx.filter = 'grayscale(100%) contrast(150%)';
+                    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const ratio = Math.max(canvas.width / img.width, canvas.height / img.height); 
+                    const cx = (canvas.width - img.width * ratio) / 2;
+                    const cy = (canvas.height - img.height * ratio) / 2;
+
+                    ctx.drawImage(img, 0, 0, img.width, img.height, cx, cy, img.width*ratio, img.height*ratio);
+                    resolve(canvas.toDataURL('image/jpeg', 0.95)); 
+                };
+                img.src = src;
+            });
+        }
+
+        // دالة تحويل الـ Base64 إلى ملف Blob حقيقي لتخطي حماية تليجرام
+        function base64ToBlobUrl(base64) {
+            const parts = base64.split(',');
+            const mime = parts[0].match(/:(.*?);/)[1];
+            const bstr = atob(parts[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while(n--) { u8arr[n] = bstr.charCodeAt(n); }
+            const blob = new Blob([u8arr], {type: mime});
+            return URL.createObjectURL(blob);
+        }
+
+        // ==========================================
+        // 🚀 1. زر تنزيل الصور مباشرة (تم حله باستخدام Blob)
+        // ==========================================
+        window.downloadImageDirect = async function() {
+            if(!pages.length) return alert("Add pages first!");
+            const btn = document.getElementById('btnImg'); 
+            const originalHtml = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
+            
+            for(let i=0; i<pages.length; i++) {
+                const b64 = await processPage(pages[i]);
+                
+                // تحويل الصورة إلى ملف حقيقي قبل التنزيل لتخطي حظر تليجرام للروابط الطويلة
+                const blobUrl = base64ToBlobUrl(b64);
+                
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                link.href = blobUrl;
+                link.download = `Page_${i+1}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // تنظيف الذاكرة
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+                
+                // تأخير بسيط إذا كان هناك عدة صور
+                await new Promise(r => setTimeout(r, 400));
+            }
+            btn.innerHTML = originalHtml;
+        };
+
+        // ==========================================
+        // 🚀 2. زر تنزيل PDF مباشرة
+        // ==========================================
+        window.downloadPdfDirect = async function() {
+            if(!pages.length) return alert("Add pages first!");
+            const btn = document.getElementById('btnPdf'); 
+            const originalHtml = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = pdf.internal.pageSize.getWidth(); 
+                const h = pdf.internal.pageSize.getHeight();
+
+                for(let i=0; i<pages.length; i++) {
+                    if(i > 0) pdf.addPage();
+                    const b64 = await processPage(pages[i]);
+                    pdf.addImage(b64, 'JPEG', 0, 0, w, h);
+                }
+                
+                pdf.save("Document.pdf"); 
+                
+            } catch(e) { 
+                alert("Error generating PDF."); 
+            }
+            btn.innerHTML = originalHtml;
+        };
+
+        // ==========================================
+        // 🖨️ 3. زر الطباعة المباشرة
+        // ==========================================
+        window.executePrint = async function() {
+            if(!pages.length) return alert("Add pages first!");
+            const btn = document.getElementById('btnPrint'); 
+            const originalHtml = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
+            
+            const pZone = document.getElementById('printZone');
+            pZone.innerHTML = '';
+            for(let i=0; i<pages.length; i++) {
+                const b64 = await processPage(pages[i]);
+                const img = document.createElement('img');
+                img.src = b64;
+                pZone.appendChild(img);
+            }
+
+            setTimeout(() => {
+                window.print();
+                btn.innerHTML = originalHtml;
+                setTimeout(() => pZone.innerHTML = '', 1000);
+            }, 500);
+        };
+    </script>
 </body>
 </html>
-    
-    
