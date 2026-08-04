@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        /* --- الألوان الفاخرة --- */
+        /* --- الألوان الفاخرة المريحة للعين --- */
         :root {
             --bg-main: #09090b;
             --bg-dock: #18181b;
@@ -32,7 +32,6 @@
             overflow: hidden;
         }
 
-        /* --- الهيدر --- */
         .header {
             padding: 20px; text-align: center; font-size: 24px; font-weight: 800;
             background: linear-gradient(90deg, #60a5fa, #a855f7);
@@ -40,7 +39,7 @@
             flex-shrink: 0;
         }
 
-        /* --- المسرح (عرض الصور) --- */
+        /* --- المسرح (عرض الصفحات) --- */
         .stage {
             flex: 1; width: 100%; display: flex; align-items: center;
             overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory;
@@ -53,7 +52,7 @@
         }
 
         .page-card {
-            width: 65vw; max-width: 260px; aspect-ratio: 1 / 1.414; /* نسبة A4 */
+            width: 65vw; max-width: 260px; aspect-ratio: 1 / 1.414; /* نسبة A4 الدقيقة */
             background: #111; border-radius: 12px; border: 1px solid #333;
             flex-shrink: 0; scroll-snap-align: center; position: relative;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden;
@@ -65,9 +64,10 @@
             position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9);
             color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%;
             display: flex; justify-content: center; align-items: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* --- اللوحة السفلية --- */
+        /* --- اللوحة السفلية (الأزرار المتطابقة الستة) --- */
         .dock {
             background: var(--bg-dock); padding: 25px 20px calc(25px + env(safe-area-inset-bottom));
             border-top-left-radius: 30px; border-top-right-radius: 30px;
@@ -80,11 +80,12 @@
             aspect-ratio: 1 / 0.95; background: var(--btn-bg); border: 1px solid #333;
             border-radius: 18px; display: flex; flex-direction: column; align-items: center;
             justify-content: center; gap: 10px; color: var(--text-main); font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: 0.15s; position: relative;
+            font-weight: 600; cursor: pointer; transition: 0.1s ease-in-out; position: relative;
         }
         .action-btn i { font-size: 26px; }
         .action-btn:active { transform: scale(0.92); background: var(--btn-active); }
         
+        /* تلوين الأيقونات بذكاء */
         .btn-link i { color: #0ea5e9; }
         .btn-gallery i { color: #3b82f6; }
         .btn-bw i { color: #f8fafc; }
@@ -113,7 +114,7 @@
 
         .modal-input {
             width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444;
-            background: #000; color: #fff; outline: none; font-size: 15px;
+            background: #000; color: #fff; outline: none; font-size: 15px; text-align: center;
         }
         
         .modal-btn {
@@ -122,13 +123,13 @@
         }
         .modal-btn.close { background: #333; margin-top: -5px; }
 
-        /* --- الطباعة --- */
+        /* --- إعدادات الطباعة الدقيقة لإلغاء الإطار الأبيض --- */
         #printZone { display: none; }
         @media print {
             body { background: white !important; margin: 0 !important; padding: 0 !important; display: block !important; }
             .header, .stage, .dock, .modal-overlay { display: none !important; }
             #printZone { display: block !important; width: 100%; }
-            #printZone img { width: 210mm; height: 297mm; object-fit: cover; page-break-after: always; display: block; margin: 0; }
+            #printZone img { width: 210mm; height: 297mm; object-fit: cover; page-break-after: always; display: block; margin: 0; padding: 0; }
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
@@ -142,33 +143,31 @@
         <div class="empty-state" id="emptyState">No pages yet.<br><span style="font-size:13px; opacity:0.5; font-weight:normal;">Add links or photos from the menu below.</span></div>
     </div>
 
-    <!-- لوحة الأزرار -->
+    <!-- لوحة الأزرار المنظمة 100% -->
     <div class="dock">
         <div class="grid-6">
+            <!-- 1 -->
             <div class="action-btn btn-link" onclick="openLinkModal()">
                 <i class="fas fa-link"></i><span>URL Link</span>
             </div>
-            
+            <!-- 2 -->
             <label class="action-btn btn-gallery">
                 <i class="fas fa-images"></i><span>Gallery</span>
                 <input type="file" accept="image/*" multiple onchange="handleGallery(event)" style="display:none;">
             </label>
-            
+            <!-- 3 -->
             <div class="action-btn btn-bw" id="bwBtn" onclick="toggleBW()">
                 <i class="fas fa-adjust"></i><span>B&W</span>
             </div>
-            
-            <!-- زر تنزيل الصور مباشرة (تم حل المشكلة) -->
+            <!-- 4 -->
             <div class="action-btn btn-img" onclick="downloadImageDirect()" id="btnImg">
                 <i class="fas fa-image"></i><span>Image</span>
             </div>
-            
-            <!-- زر تنزيل الـ PDF مباشرة -->
+            <!-- 5 -->
             <div class="action-btn btn-pdf" onclick="downloadPdfDirect()" id="btnPdf">
                 <i class="fas fa-file-pdf"></i><span>PDF</span>
             </div>
-            
-            <!-- زر الطباعة مباشرة -->
+            <!-- 6 -->
             <div class="action-btn btn-print" onclick="executePrint()" id="btnPrint">
                 <i class="fas fa-print"></i><span>Print</span>
             </div>
@@ -185,12 +184,18 @@
         </div>
     </div>
 
-    <!-- مساحة الطباعة -->
+    <!-- مساحة الطباعة المخفية -->
     <div id="printZone"></div>
 
     <script>
+        // تفعيل تليجرام ويب أب
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         if (tg) { tg.ready(); tg.expand(); }
+
+        // إعطاء نبضة اهتزاز عند التفاعل (لجعل التطبيق حياً ومطيعاً)
+        function triggerHaptic(type = 'light') {
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
+        }
 
         let pages = [];
         let isBw = false;
@@ -215,16 +220,20 @@
             });
         }
 
-        window.removePage = function(idx) { pages.splice(idx, 1); renderStage(); };
+        window.removePage = function(idx) { 
+            pages.splice(idx, 1); 
+            renderStage(); 
+            triggerHaptic('medium');
+        };
 
         function addPage(src) {
             const img = new Image(); img.crossOrigin = "anonymous";
-            img.onload = () => { pages.push(src); renderStage(); };
-            img.onerror = () => alert("⚠️ Cannot load link due to server protection. Please save the image to your phone first.");
+            img.onload = () => { pages.push(src); renderStage(); triggerHaptic('success'); };
+            img.onerror = () => { alert("⚠️ Cannot load link due to server protection. Please save the image to your phone first."); triggerHaptic('error'); };
             img.src = src;
         }
 
-        window.openLinkModal = () => { urlInput.value = ''; linkModal.classList.add('active'); };
+        window.openLinkModal = () => { urlInput.value = ''; linkModal.classList.add('active'); triggerHaptic(); };
         window.closeLinkModal = () => { linkModal.classList.remove('active'); };
         window.submitUrl = () => { if(urlInput.value) { addPage(urlInput.value); closeLinkModal(); } };
 
@@ -237,15 +246,17 @@
                 reader.readAsDataURL(f);
             });
             e.target.value = '';
+            triggerHaptic('light');
         };
 
         window.toggleBW = function() {
             isBw = !isBw;
             bwBtn.classList.toggle('bw-active', isBw);
             renderStage();
+            triggerHaptic('medium');
         };
 
-        // معالجة A4 بدون أي أطراف بيضاء
+        // معالجة A4 صارمة (Cover Crop) لإلغاء أي حواف بيضاء
         function processPage(src) {
             return new Promise((resolve) => {
                 const img = new Image(); img.crossOrigin = "anonymous";
@@ -268,7 +279,7 @@
             });
         }
 
-        // دالة تحويل الـ Base64 إلى ملف Blob حقيقي لتخطي حماية تليجرام
+        // تحويل الـ Base64 إلى Blob آمن لتخطي حظر تنزيل تليجرام
         function base64ToBlobUrl(base64) {
             const parts = base64.split(',');
             const mime = parts[0].match(/:(.*?);/)[1];
@@ -281,18 +292,17 @@
         }
 
         // ==========================================
-        // 🚀 1. زر تنزيل الصور مباشرة (تم حله باستخدام Blob)
+        // 📥 1. زر تحميل الصور بضغطة واحدة
         // ==========================================
         window.downloadImageDirect = async function() {
-            if(!pages.length) return alert("Add pages first!");
+            if(!pages.length) return alert("سيدي، الرجاء إضافة صورة أولاً.");
+            triggerHaptic('heavy');
             const btn = document.getElementById('btnImg'); 
             const originalHtml = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
             
             for(let i=0; i<pages.length; i++) {
                 const b64 = await processPage(pages[i]);
-                
-                // تحويل الصورة إلى ملف حقيقي قبل التنزيل لتخطي حظر تليجرام للروابط الطويلة
                 const blobUrl = base64ToBlobUrl(b64);
                 
                 const link = document.createElement('a');
@@ -303,20 +313,20 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                // تنظيف الذاكرة
                 setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
-                
-                // تأخير بسيط إذا كان هناك عدة صور
-                await new Promise(r => setTimeout(r, 400));
+                await new Promise(r => setTimeout(r, 300)); // فاصل زمني بسيط لضمان تنزيل الكل
             }
+            
             btn.innerHTML = originalHtml;
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         };
 
         // ==========================================
-        // 🚀 2. زر تنزيل PDF مباشرة
+        // 📄 2. زر تحميل PDF بضغطة واحدة
         // ==========================================
         window.downloadPdfDirect = async function() {
-            if(!pages.length) return alert("Add pages first!");
+            if(!pages.length) return alert("سيدي، الرجاء إضافة صورة أولاً.");
+            triggerHaptic('heavy');
             const btn = document.getElementById('btnPdf'); 
             const originalHtml = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
@@ -330,22 +340,26 @@
                 for(let i=0; i<pages.length; i++) {
                     if(i > 0) pdf.addPage();
                     const b64 = await processPage(pages[i]);
-                    pdf.addImage(b64, 'JPEG', 0, 0, w, h);
+                    pdf.addImage(b64, 'JPEG', 0, 0, w, h); // تغطية الورقة بالكامل بدون إطار أبيض
                 }
                 
+                // أمر التنزيل المباشر
                 pdf.save("Document.pdf"); 
+                if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 
             } catch(e) { 
-                alert("Error generating PDF."); 
+                alert("حدث خطأ أثناء التوليد يا سيدي."); 
+                if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
             }
             btn.innerHTML = originalHtml;
         };
 
         // ==========================================
-        // 🖨️ 3. زر الطباعة المباشرة
+        // 🖨️ 3. زر الطباعة المباشرة بضغطة واحدة
         // ==========================================
         window.executePrint = async function() {
-            if(!pages.length) return alert("Add pages first!");
+            if(!pages.length) return alert("سيدي، الرجاء إضافة صورة أولاً.");
+            triggerHaptic('heavy');
             const btn = document.getElementById('btnPrint'); 
             const originalHtml = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Wait</span>';
@@ -359,6 +373,7 @@
                 pZone.appendChild(img);
             }
 
+            // استدعاء نافذة الطباعة الرسمية
             setTimeout(() => {
                 window.print();
                 btn.innerHTML = originalHtml;
