@@ -151,7 +151,6 @@
         .loading-text::after { content: ''; animation: dots 1.5s infinite steps(1); }
         @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
 
-        /* --- اللعبة --- */
         .game-container { position: absolute; top: 55px; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); z-index: 100; border-radius: 0 0 28px 28px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: 0.4s ease; overflow: hidden; }
         .game-container.active { opacity: 1; visibility: visible; }
         #gameCanvas { width: 100%; height: 100%; cursor: pointer; }
@@ -161,9 +160,7 @@
         .game-over-ui button { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; transition: 0.3s; }
         .game-over-ui button:hover { transform: scale(1.05); }
 
-        /* ====== استوديو الطباعة والـ PDF (مختصر وأنيق) ====== */
         .print-ui-wrapper { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 450px; margin: 0 auto; }
-        
         .preview-carousel { display: flex; gap: 10px; overflow-x: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-glass); height: 130px; align-items: center; }
         .preview-carousel::-webkit-scrollbar { height: 4px; }
         .preview-carousel::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
@@ -174,7 +171,6 @@
         .thumb-wrap.bw-active img { filter: grayscale(100%) contrast(150%); }
         .thumb-del { position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: white; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         
-        /* شبكة الأزرار المنظمة */
         .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         
         .p-btn-sm { background: rgba(255,255,255,0.06); border: 1px solid var(--border-glass); color: #fff; padding: 10px 5px; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s; position: relative; overflow: hidden; text-align: center; }
@@ -202,7 +198,6 @@
     <div class="player-card">
         <canvas id="decorCanvas"></canvas>
         <div class="header">
-            <!-- الترتيب الأصلي للجهة اليسرى مع زر المطبعة في النهاية -->
             <div class="header-left">
                 <button class="icon-btn" id="toggleTimerBtn" title="Timers"><i class="fas fa-stopwatch"></i><span id="mainHeaderTimer" class="header-timer-text"></span></button>
                 <button class="icon-btn" id="shareBtn" title="Share Bot"><i class="fas fa-share-alt"></i></button>
@@ -215,7 +210,6 @@
             
             <div class="header-country" id="headerCountry">Global Radio</div>
             
-            <!-- الترتيب الأصلي للجهة اليمنى -->
             <div class="header-right">
                 <a href="https://www.paypal.com/qrcodes/p2pqrc/JE8TVPBFXA566" target="_blank" class="donate-btn" title="Support Developer"><i class="fab fa-paypal"></i></a>
                 <button class="icon-btn" id="openFavsBtn" title="Saved Stations"><i class="fas fa-list-ul"></i></button>
@@ -287,23 +281,20 @@
         <div style="flex:1; overflow-y:auto; margin-top:5px;"><ul id="notesList" style="list-style:none; display:flex; flex-direction:column; gap:8px;"></ul></div>
     </div>
 
-    <!-- نافذة أستوديو الطباعة الأنيقة -->
+    <!-- Print Studio Modal -->
     <div class="modal" id="printModal">
         <div class="modal-header">
-            <span>🖨️ Document Studio</span>
+            <span>🖨️ Print Studio</span>
             <button class="close-modal" id="closePrintBtn"><i class="fas fa-times"></i></button>
         </div>
         
         <div class="print-ui-wrapper">
-            <!-- شريط الصور المضافة -->
             <div class="preview-carousel" id="printPreviewArea">
                 <div id="emptyPreviewText">No Pages Added</div>
             </div>
 
-            <!-- إدخال الرابط -->
             <input type="text" id="pImageUrl" class="p-input" placeholder="🔗 Paste Link & press Enter..." onkeypress="if(event.key === 'Enter') addFromUrl()">
 
-            <!-- أدوات الإضافة والتعديل -->
             <div class="p-grid">
                 <button class="p-btn-sm" onclick="addFromUrl()">
                     <i class="fas fa-link"></i> Add Link
@@ -317,7 +308,6 @@
                 </button>
             </div>
 
-            <!-- أدوات التصدير للتحميل المباشر -->
             <div class="p-grid" style="margin-top: 5px;">
                 <button class="p-btn-sm primary" id="btnDlImg" onclick="downloadAllImages()">
                     <i class="fas fa-image"></i> Save Image
@@ -329,6 +319,7 @@
                     <i class="fas fa-print"></i> Print
                 </button>
             </div>
+            <div id="printResults"></div>
         </div>
     </div>
 
@@ -444,14 +435,14 @@
         });
         DOM.vol.addEventListener('input', () => { if (tg && tg.HapticFeedback && Math.random() > 0.4) { tg.HapticFeedback.impactOccurred('medium'); } });
 
-        // --- 🖨️ أستوديو الطباعة والـ PDF الجديد والمختصر ---
         (function initPrintStudio() {
             const printModal = document.getElementById('printModal');
             const openPrintBtn = document.getElementById('openPrintBtn');
             const closePrintBtn = document.getElementById('closePrintBtn');
+            const resultsDiv = document.getElementById('printResults');
 
-            openPrintBtn.addEventListener('click', () => printModal.classList.add('open'));
-            closePrintBtn.addEventListener('click', () => printModal.classList.remove('open'));
+            openPrintBtn.addEventListener('click', () => { printModal.classList.add('open'); resultsDiv.innerHTML = ''; });
+            closePrintBtn.addEventListener('click', () => { printModal.classList.remove('open'); });
 
             let imgList = [];
             let isBW = false;
@@ -514,7 +505,7 @@
                     const img = new Image(); img.crossOrigin = "anonymous";
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        canvas.width = 1404; canvas.height = 1986; // أبعاد A4
+                        canvas.width = 1404; canvas.height = 1986;
                         const ctx = canvas.getContext('2d');
                         if (isBW) ctx.filter = 'grayscale(100%) contrast(150%)';
                         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -532,7 +523,6 @@
                 });
             }
 
-            // التحميل المباشر للصور باستخدام Native Share إذا أمكن (الأفضل لتليجرام)
             window.downloadAllImages = async function() {
                 if(imgList.length === 0) return alert("Add images first!");
                 const btn = document.getElementById('btnDlImg'); const txt = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
@@ -546,10 +536,9 @@
                         filesArray.push(new File([blob], `Page_${i+1}.jpg`, { type: "image/jpeg" }));
                     }
 
-                    if (navigator.canShare && navigator.canShare({ files: filesArray })) {
-                        await navigator.share({ files: filesArray, title: 'Document Images' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: filesArray })) {
+                        await navigator.share({ files: filesArray, title: 'Studio Images' });
                     } else {
-                        // التحميل التقليدي
                         for (let f of filesArray) {
                             const url = URL.createObjectURL(f);
                             const a = document.createElement('a');
@@ -559,11 +548,10 @@
                             await new Promise(r => setTimeout(r, 300)); 
                         }
                     }
-                } catch(e) { alert("Error saving images."); }
+                } catch(e) { console.log(e); }
                 btn.innerHTML = txt;
             };
 
-            // التحميل المباشر للـ PDF
             window.generateBorderlessPDF = async function() {
                 if(imgList.length === 0) return alert("Add images first!");
                 const btn = document.getElementById('btnDlPdf'); const txt = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
@@ -579,18 +567,18 @@
                     }
                     
                     const blob = pdf.output('blob');
-                    const file = new File([blob], "Radio_Document.pdf", { type: "application/pdf" });
+                    const file = new File([blob], "Studio_Document.pdf", { type: "application/pdf" });
 
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({ files: [file], title: 'Radio Document' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({ files: [file], title: 'Studio Document' });
                     } else {
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
-                        a.href = url; a.download = "Radio_Document.pdf";
+                        a.href = url; a.download = "Studio_Document.pdf";
                         document.body.appendChild(a); a.click(); document.body.removeChild(a);
                         URL.revokeObjectURL(url);
                     }
-                } catch(e) { alert("Error generating PDF"); }
+                } catch(e) { console.log(e); }
                 btn.innerHTML = txt;
             };
 
